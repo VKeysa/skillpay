@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPay — Courses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1B2A;--navy-mid:#1A2E45;--navy-light:#243B55;
+  --gold:#C9933A;--gold-light:#E8B86D;
+  --cream:#F9F5EF;--cream-dark:#EDE8DF;
+  --white:#FFFFFF;--muted:#7A8A9A;--body:#2C3E50;--border:#DDD8CE;
+  --green:#1D9E75;--purple:#534AB7;--coral:#993C1D;--blue:#185FA5;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--body);font-size:15px;min-height:100vh}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── SHARED LAYOUT ── */
+.app-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sidebar-logo{font-family:'Playfair Display',serif;color:var(--white);font-size:18px;font-weight:700;padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo span{color:var(--gold)}
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.nav-item.active{background:rgba(201,147,58,0.15);color:var(--gold-light)}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.sidebar-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07)}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--white);flex-shrink:0}
+.user-name{font-size:13px;color:rgba(255,255,255,0.8);font-weight:500}
+.user-plan{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:24px;transition:color 0.15s}
+.back-btn:hover{color:var(--navy)}
+
+/* ── COURSES PAGE ── */
+.courses-main{padding:36px;overflow-y:auto}
+.page-header{margin-bottom:32px}
+.page-header h2{font-size:30px;color:var(--navy);margin-bottom:6px}
+.page-header p{font-size:14px;color:var(--muted);font-weight:300}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.filter-btn{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;transition:all 0.15s}
+.filter-btn:hover{border-color:var(--navy);color:var(--navy)}
+.filter-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+.courses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.course-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+.course-card:hover{box-shadow:0 8px 32px rgba(13,27,42,0.1);transform:translateY(-2px)}
+.course-thumb{height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.course-thumb-icon{font-family:'Playfair Display',serif;font-size:48px;opacity:0.15;color:var(--white)}
+.course-thumb-label{position:absolute;bottom:12px;left:12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,0.15);color:var(--white);backdrop-filter:blur(4px)}
+.course-thumb-lessons{position:absolute;top:12px;right:12px;font-size:11px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.2);padding:3px 8px;border-radius:10px}
+.course-body{padding:16px 18px}
+.course-subject{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.course-title{font-size:16px;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.course-desc{font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px}
+.course-footer{display:flex;align-items:center;justify-content:space-between}
+.course-meta{display:flex;gap:12px}
+.course-meta span{font-size:12px;color:var(--muted)}
+.course-rating{font-size:12px;color:var(--gold);font-weight:500}
+.prog-mini{height:3px;background:var(--cream-dark);border-radius:2px;margin-top:10px;overflow:hidden}
+.prog-mini-fill{height:100%;background:var(--gold);border-radius:2px}
+
+/* ── LESSON LIST PAGE ── */
+.lesson-list-main{padding:36px;overflow-y:auto}
+.course-hero{background:var(--navy);border-radius:14px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:28px}
+.course-hero-icon{width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.course-hero h2{font-size:24px;color:var(--white);margin-bottom:6px}
+.course-hero p{font-size:13px;color:rgba(255,255,255,0.5);font-weight:300;margin-bottom:14px}
+.course-hero-meta{display:flex;gap:18px}
+.hero-meta-item{font-size:12px;color:rgba(255,255,255,0.4)}
+.hero-meta-item span{color:var(--gold-light);font-weight:500}
+.lessons-section h3{font-family:'Playfair Display',serif;font-size:19px;color:var(--navy);margin-bottom:16px}
+.lesson-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.15s;margin-bottom:10px}
+.lesson-item:hover{box-shadow:0 4px 16px rgba(13,27,42,0.08);border-color:#bbb}
+.lesson-item.current{border-color:var(--gold)}
+.lesson-item.locked{opacity:0.6;cursor:not-allowed}
+.l-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.l-num.done{background:rgba(201,147,58,0.12);color:var(--gold)}
+.l-num.active{background:var(--navy);color:var(--white)}
+.l-num.locked{background:var(--cream-dark);color:var(--muted)}
+.l-info{flex:1}
+.l-title{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:3px}
+.l-desc{font-size:12px;color:var(--muted);font-weight:300}
+.l-right{display:flex;align-items:center;gap:10px}
+.l-time{font-size:12px;color:var(--muted)}
+.l-tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.l-tag.done{background:rgba(201,147,58,0.1);color:var(--gold)}
+.l-tag.active{background:rgba(13,27,42,0.08);color:var(--navy)}
+.l-tag.locked{background:var(--cream-dark);color:var(--muted)}
+
+/* ── LESSON PAGE ── */
+.lesson-main{padding:36px;overflow-y:auto;max-width:900px}
+.lesson-header{margin-bottom:24px}
+.lesson-breadcrumb{font-size:12px;color:var(--muted);margin-bottom:10px}
+.lesson-breadcrumb span{color:var(--gold);cursor:pointer}
+.lesson-header h2{font-size:26px;color:var(--navy);margin-bottom:8px}
+.lesson-tags{display:flex;gap:8px;flex-wrap:wrap}
+.lesson-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);color:var(--muted);font-weight:500}
+
+/* Video */
+.video-wrap{background:var(--navy);border-radius:14px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:28px;position:relative;overflow:hidden;cursor:pointer}
+.video-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.play-btn{width:64px;height:64px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
+.play-btn:hover{transform:scale(1.08)}
+.play-icon{width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:20px solid white;margin-left:4px}
+.video-label{font-size:13px;color:rgba(255,255,255,0.4)}
+
+/* Tabs */
+.lesson-tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--cream-dark);padding:4px;border-radius:10px;width:fit-content}
+.tab-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;border:none;background:transparent;font-family:'DM Sans',sans-serif}
+.tab-btn.active{background:var(--white);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Explanation */
+.explanation-body h3{font-size:18px;color:var(--navy);margin:20px 0 10px}
+.explanation-body h3:first-child{margin-top:0}
+.explanation-body p{font-size:14px;color:var(--body);line-height:1.8;margin-bottom:14px;font-weight:300}
+.explanation-body ul{margin:0 0 14px 18px}
+.explanation-body ul li{font-size:14px;color:var(--body);line-height:1.8;font-weight:300;margin-bottom:6px}
+.highlight-box{background:rgba(201,147,58,0.07);border-left:3px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;margin:16px 0}
+.highlight-box p{margin:0;font-size:14px;color:var(--body);font-weight:400}
+
+/* Task */
+.task-card{background:var(--navy);border-radius:12px;padding:24px 28px;margin-bottom:16px}
+.task-card h3{font-size:17px;color:var(--white);margin-bottom:8px}
+.task-card p{font-size:13px;color:rgba(255,255,255,0.6);font-weight:300;line-height:1.7;margin-bottom:20px}
+.task-steps{list-style:none}
+.task-steps li{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;font-size:14px;color:rgba(255,255,255,0.75)}
+.task-step-num{width:24px;height:24px;border-radius:50%;background:rgba(201,147,58,0.2);color:var(--gold);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.task-input{width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-top:16px;resize:vertical;min-height:80px}
+.task-input::placeholder{color:rgba(255,255,255,0.25)}
+.task-input:focus{border-color:var(--gold)}
+.task-submit{margin-top:12px;padding:11px 24px;background:var(--gold);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s}
+.task-submit:hover{background:var(--gold-light)}
+
+/* Quiz */
+.quiz-question{margin-bottom:28px}
+.quiz-q{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:14px}
+.quiz-options{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;color:var(--body);cursor:pointer;transition:all 0.15s;background:var(--white)}
+.quiz-opt:hover{border-color:var(--gold);background:rgba(201,147,58,0.04)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(29,158,117,0.06);color:var(--green)}
+.quiz-opt.wrong{border-color:#E24B4A;background:rgba(226,75,74,0.06);color:#E24B4A}
+.quiz-submit{padding:12px 28px;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:8px}
+.quiz-submit:hover{background:var(--navy-mid)}
+.quiz-result{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-top:14px;display:none}
+.quiz-result.show{display:block}
+.quiz-result.pass{background:rgba(29,158,117,0.1);color:var(--green);border:1px solid rgba(29,158,117,0.2)}
+.quiz-result.fail{background:rgba(226,75,74,0.08);color:#E24B4A;border:1px solid rgba(226,75,74,0.15)}
+
+/* Reflection */
+.reflection-prompt{font-size:14px;color:var(--body);line-height:1.7;margin-bottom:16px;font-weight:300}
+.reflection-q{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:8px;margin-top:20px}
+textarea.reflect-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--body);outline:none;resize:vertical;min-height:90px;background:var(--white);transition:border-color 0.2s}
+textarea.reflect-input:focus{border-color:var(--gold)}
+.complete-btn{display:flex;align-items:center;gap:10px;margin-top:24px;padding:14px 28px;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s}
+.complete-btn:hover{background:var(--gold)}
+.complete-icon{width:20px;height:20px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px}
+
+/* Nav between lessons */
+.lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)}
+.lesson-nav-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;background:var(--white);transition:all 0.15s}
+.lesson-nav-btn:hover{border-color:var(--navy);background:var(--cream)}
+.lesson-nav-btn.primary{background:var(--navy);color:var(--white);border-color:var(--navy)}
+.lesson-nav-btn.primary:hover{background:var(--gold);border-color:var(--gold)}
+
+@media(max-width:900px){
+  .app-layout{grid-template-columns:1fr}
+  .courses-grid{grid-template-columns:1fr 1fr}
+  .sidebar{height:auto;position:relative}
+}
+@media(max-width:600px){
+  .courses-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ COURSES LIST ═══ -->
+<div id="screen-courses" class="screen active">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Skill<span>Pay</span></div>
+      <div class="sidebar-nav">
+        <div class="nav-item" onclick="window.location.href='skillpay-dashboard.html'">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          My courses
+        </div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Progress
+        </div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 13c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          AI tutor
+        </div>
+        <div class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Account
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-row">
+          <div class="avatar">JS</div>
+          <div>
+            <div class="user-name">Jordan S.</div>
+            <div class="user-plan">Student plan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="courses-main">
+      <div class="page-header">
+        <h2>All courses</h2>
+        <p>Pick a skill, start learning, and earn your first income online.</p>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterCourses('all',this)">All</button>
+        <button class="filter-btn" onclick="filterCourses('freelancing',this)">Freelancing</button>
+        <button class="filter-btn" onclick="filterCourses('content',this)">Content creation</button>
+        <button class="filter-btn" onclick="filterCourses('digital',this)">Digital products</button>
+        <button class="filter-btn" onclick="filterCourses('crypto',this)">Crypto & investing</button>
+        <button class="filter-btn" onclick="filterCourses('coding',this)">Coding & tech</button>
+      </div>
+      <div class="courses-grid" id="courses-grid">
+
+        <!-- FLAGSHIP -->
+        <div class="course-card" data-cat="freelancing digital" onclick="openCourse('hundred')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#0D1B2A,#1A2E45)">
+            <div class="course-thumb-icon">$</div>
+            <div class="course-thumb-label">Flagship</div>
+            <div class="course-thumb-lessons">5 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--gold)">Getting started</div>
+            <div class="course-title">Make Your First $100 Online</div>
+            <div class="course-desc">The fastest path from zero to your first dollar online. Real strategies, zero fluff.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>5 lessons</span><span>2h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.9</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:35%"></div></div>
+          </div>
+        </div>
+
+        <!-- FREELANCING -->
+        <div class="course-card" data-cat="freelancing" onclick="openCourse('freelancing')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#185FA5,#243B55)">
+            <div class="course-thumb-icon">&#9998;</div>
+            <div class="course-thumb-label">Freelancing</div>
+            <div class="course-thumb-lessons">6 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--blue)">Freelancing & services</div>
+            <div class="course-title">Land Your First Freelance Client</div>
+            <div class="course-desc">Build a profile, write winning proposals, and land paying clients on Fiverr and Upwork.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>6 lessons</span><span>2.5h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.8</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="course-card" data-cat="content" onclick="openCourse('content')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#993556,#4B1528)">
+            <div class="course-thumb-icon">&#9654;</div>
+            <div class="course-thumb-label">Content</div>
+            <div class="course-thumb-lessons">7 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--coral)">Content creation</div>
+            <div class="course-title">Grow to 1,000 Followers Fast</div>
+            <div class="course-desc">Create short-form content that grows your audience on TikTok and Instagram from scratch.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>7 lessons</span><span>3h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.9</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- DIGITAL PRODUCTS -->
+        <div class="course-card" data-cat="digital" onclick="openCourse('digital')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#1D9E75,#04342C)">
+            <div class="course-thumb-icon">&#9660;</div>
+            <div class="course-thumb-label">Digital products</div>
+            <div class="course-thumb-lessons">5 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--green)">Digital products</div>
+            <div class="course-title">Sell Your First Digital Product</div>
+            <div class="course-desc">Create an ebook, template or guide and sell it on Gumroad or Etsy within a week.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>5 lessons</span><span>2h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.7</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- CRYPTO -->
+        <div class="course-card" data-cat="crypto" onclick="openCourse('crypto')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#854F0B,#412402)">
+            <div class="course-thumb-icon">&#9650;</div>
+            <div class="course-thumb-label">Investing</div>
+            <div class="course-thumb-lessons">6 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:#BA7517">Crypto & investing</div>
+            <div class="course-title">Crypto & Investing for Beginners</div>
+            <div class="course-desc">Understand Bitcoin, altcoins, wallets and how to invest safely without losing everything.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>6 lessons</span><span>2.5h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.6</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- CODING -->
+        <div class="course-card" data-cat="coding" onclick="openCourse('coding')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#534AB7,#26215C)">
+            <div class="course-thumb-icon">&lt;/&gt;</div>
+            <div class="course-thumb-label">Coding</div>
+            <div class="course-thumb-lessons">8 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--purple)">Coding & tech</div>
+            <div class="course-title">Build & Sell Your First App or Website</div>
+            <div class="course-desc">Learn HTML, CSS and basic JavaScript then build something you can sell or show to clients.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>8 lessons</span><span>4h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.8</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- AFFILIATE -->
+        <div class="course-card" data-cat="digital content" onclick="openCourse('affiliate')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#3B6D11,#173404)">
+            <div class="course-thumb-icon">&#9670;</div>
+            <div class="course-thumb-label">Affiliate</div>
+            <div class="course-thumb-lessons">5 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--green)">Affiliate marketing</div>
+            <div class="course-title">Earn With Affiliate Marketing</div>
+            <div class="course-desc">Promote other people's products and earn commissions without creating anything yourself.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>5 lessons</span><span>2h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.7</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- DROPSHIPPING -->
+        <div class="course-card" data-cat="digital" onclick="openCourse('dropship')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#A32D2D,#501313)">
+            <div class="course-thumb-icon">&#9632;</div>
+            <div class="course-thumb-label">E-commerce</div>
+            <div class="course-thumb-lessons">6 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:#E24B4A">E-commerce & dropshipping</div>
+            <div class="course-title">Start a Dropshipping Store</div>
+            <div class="course-desc">Set up a Shopify store, find winning products and make your first sale without holding inventory.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>6 lessons</span><span>3h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.5</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- SOCIAL MEDIA MGMT -->
+        <div class="course-card" data-cat="freelancing content" onclick="openCourse('smm')">
+          <div class="course-thumb" style="background:linear-gradient(135deg,#185FA5,#042C53)">
+            <div class="course-thumb-icon">&#9711;</div>
+            <div class="course-thumb-label">Social media</div>
+            <div class="course-thumb-lessons">5 lessons</div>
+          </div>
+          <div class="course-body">
+            <div class="course-subject" style="color:var(--blue)">Social media management</div>
+            <div class="course-title">Get Paid to Manage Social Media</div>
+            <div class="course-desc">Offer social media services to small businesses and land your first $300/month retainer.</div>
+            <div class="course-footer">
+              <div class="course-meta"><span>5 lessons</span><span>2h</span><span>Beginner</span></div>
+              <div class="course-rating">★ 4.8</div>
+            </div>
+            <div class="prog-mini"><div class="prog-mini-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LESSON LIST ═══ -->
+<div id="screen-lesson-list" class="screen">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Skill<span>Pay</span></div>
+      <div class="sidebar-nav">
+        <div class="nav-item" onclick="showScreen('courses')">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          My courses
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-row">
+          <div class="avatar">JS</div>
+          <div><div class="user-name">Jordan S.</div><div class="user-plan">Student plan</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-list-main">
+      <div class="back-btn" onclick="showScreen('courses')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Back to courses
+      </div>
+      <div class="course-hero" id="course-hero">
+        <div class="course-hero-icon" id="hero-icon"></div>
+        <div>
+          <h2 id="hero-title">Course title</h2>
+          <p id="hero-desc">Course description</p>
+          <div class="course-hero-meta">
+            <div class="hero-meta-item" id="hero-lessons">Lessons: <span>—</span></div>
+            <div class="hero-meta-item" id="hero-level">Level: <span>Beginner</span></div>
+            <div class="hero-meta-item" id="hero-time">Time: <span>—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="lessons-section">
+        <h3>Course lessons</h3>
+        <div id="lesson-list-items"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LESSON VIEWER ═══ -->
+<div id="screen-lesson" class="screen">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Skill<span>Pay</span></div>
+      <div class="sidebar-nav">
+        <div class="nav-item" onclick="showScreen('courses')">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          My courses
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-row">
+          <div class="avatar">JS</div>
+          <div><div class="user-name">Jordan S.</div><div class="user-plan">Student plan</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-main">
+      <div class="back-btn" onclick="showScreen('lesson-list')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Back to course
+      </div>
+      <div class="lesson-header">
+        <div class="lesson-breadcrumb" id="lesson-breadcrumb">Courses / <span>Course name</span></div>
+        <h2 id="lesson-title">Lesson title</h2>
+        <div class="lesson-tags" id="lesson-tags"></div>
+      </div>
+      <div class="video-wrap" id="video-wrap">
+        <div class="video-bg">
+          <div class="play-btn"><div class="play-icon"></div></div>
+          <div class="video-label" id="video-label">Watch lesson video</div>
+        </div>
+      </div>
+      <div class="lesson-tabs">
+        <button class="tab-btn active" onclick="switchTab('explanation',this)">Explanation</button>
+        <button class="tab-btn" onclick="switchTab('task',this)">Task</button>
+        <button class="tab-btn" onclick="switchTab('quiz',this)">Quiz</button>
+        <button class="tab-btn" onclick="switchTab('reflection',this)">Reflection</button>
+      </div>
+      <div id="tab-explanation" class="tab-content active">
+        <div class="explanation-body" id="explanation-body"></div>
+      </div>
+      <div id="tab-task" class="tab-content">
+        <div id="task-body"></div>
+      </div>
+      <div id="tab-quiz" class="tab-content">
+        <div id="quiz-body"></div>
+      </div>
+      <div id="tab-reflection" class="tab-content">
+        <div id="reflection-body"></div>
+      </div>
+      <div class="lesson-nav">
+        <button class="lesson-nav-btn" id="prev-btn" onclick="navigateLesson(-1)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Previous
+        </button>
+        <button class="lesson-nav-btn primary" id="next-btn" onclick="navigateLesson(1)">
+          Next lesson
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 11l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const COURSES = {
+  hundred: {
+    title: "Make Your First $100 Online",
+    desc: "The fastest path from zero to your first dollar online.",
+    icon: "💰", color: "#C9933A", lessons: [
+      { title: "Find your first income opportunity", desc: "Identify the best method for your situation", time: "20min", status: "done" },
+      { title: "Set up your digital presence", desc: "Build your profile and first offer", time: "25min", status: "done" },
+      { title: "Land your first client or sale", desc: "Outreach, pitching, and closing", time: "30min", status: "active" },
+      { title: "Scale past $100 consistently", desc: "Build systems that repeat your results", time: "25min", status: "locked" },
+      { title: "Build a repeatable system", desc: "Automate and grow your income streams", time: "20min", status: "locked" }
+    ]
+  },
+  freelancing: {
+    title: "Land Your First Freelance Client",
+    desc: "Build a profile, write proposals and land paying clients.",
+    icon: "✍️", color: "#185FA5", lessons: [
+      { title: "Choosing your freelance niche", desc: "Pick the right skill to monetize", time: "20min", status: "active" },
+      { title: "Setting up your Fiverr & Upwork profile", desc: "Profiles that attract buyers", time: "25min", status: "locked" },
+      { title: "Writing proposals that win", desc: "The anatomy of a winning proposal", time: "25min", status: "locked" },
+      { title: "Pricing your services confidently", desc: "How to price without underselling", time: "20min", status: "locked" },
+      { title: "Your first client conversation", desc: "How to handle discovery calls", time: "25min", status: "locked" },
+      { title: "Delivering and getting 5-star reviews", desc: "Overdeliver and build your reputation", time: "20min", status: "locked" }
+    ]
+  },
+  content: {
+    title: "Grow to 1,000 Followers Fast",
+    desc: "Create short-form content that grows your audience from scratch.",
+    icon: "🎬", color: "#993556", lessons: [
+      { title: "Picking your niche and content angle", desc: "Find what you can talk about every day", time: "20min", status: "active" },
+      { title: "The anatomy of a viral short video", desc: "Hook, body, CTA — the formula", time: "25min", status: "locked" },
+      { title: "Filming with just your phone", desc: "No fancy gear needed", time: "20min", status: "locked" },
+      { title: "Editing fast with CapCut", desc: "Quick edits that look polished", time: "30min", status: "locked" },
+      { title: "Posting schedule and consistency", desc: "The system that actually works", time: "20min", status: "locked" },
+      { title: "Engaging your audience to grow faster", desc: "Comments, DMs and community", time: "20min", status: "locked" },
+      { title: "Monetising at 1K followers", desc: "How to make money before 10K", time: "25min", status: "locked" }
+    ]
+  },
+  digital: {
+    title: "Sell Your First Digital Product",
+    desc: "Create and sell an ebook, template or guide within a week.",
+    icon: "📦", color: "#1D9E75", lessons: [
+      { title: "What digital product should you make?", desc: "The 5 types that sell best for beginners", time: "20min", status: "active" },
+      { title: "Creating your product in Canva or Notion", desc: "Fast creation with free tools", time: "30min", status: "locked" },
+      { title: "Setting up your Gumroad store", desc: "Free to start, takes 10 minutes", time: "20min", status: "locked" },
+      { title: "Writing a sales page that converts", desc: "The words that make people buy", time: "25min", status: "locked" },
+      { title: "Getting your first sale with no audience", desc: "Promote in communities and groups", time: "25min", status: "locked" }
+    ]
+  },
+  crypto: {
+    title: "Crypto & Investing for Beginners",
+    desc: "Understand Bitcoin, altcoins and how to invest safely.",
+    icon: "📈", color: "#BA7517", lessons: [
+      { title: "What is crypto and why does it matter?", desc: "The basics without the hype", time: "25min", status: "active" },
+      { title: "Bitcoin vs altcoins — what to know", desc: "Understanding the landscape", time: "25min", status: "locked" },
+      { title: "Setting up a wallet and exchange account", desc: "Coinbase, Metamask and more", time: "20min", status: "locked" },
+      { title: "How to buy your first crypto safely", desc: "Step by step with real examples", time: "25min", status: "locked" },
+      { title: "Risk management — not losing everything", desc: "The most important lesson in investing", time: "30min", status: "locked" },
+      { title: "Long-term vs short-term strategies", desc: "HODLing, DCA and trading basics", time: "25min", status: "locked" }
+    ]
+  },
+  coding: {
+    title: "Build & Sell Your First App or Website",
+    desc: "Learn HTML, CSS and JS then build something you can sell.",
+    icon: "💻", color: "#534AB7", lessons: [
+      { title: "How the web works — HTML basics", desc: "Your first webpage in 20 minutes", time: "25min", status: "active" },
+      { title: "Styling with CSS", desc: "Make it look good without a designer", time: "30min", status: "locked" },
+      { title: "Making it interactive with JavaScript", desc: "Buttons, forms and basic logic", time: "30min", status: "locked" },
+      { title: "Building a landing page from scratch", desc: "A real project step by step", time: "40min", status: "locked" },
+      { title: "Hosting your site for free with Vercel", desc: "Get a live URL in 5 minutes", time: "20min", status: "locked" },
+      { title: "Finding clients who need websites", desc: "Where to look and how to pitch", time: "25min", status: "locked" },
+      { title: "Pricing and delivering web projects", desc: "From quote to final delivery", time: "25min", status: "locked" },
+      { title: "Building your coding portfolio", desc: "Show your work and attract clients", time: "20min", status: "locked" }
+    ]
+  },
+  affiliate: {
+    title: "Earn With Affiliate Marketing",
+    desc: "Earn commissions by promoting other people's products.",
+    icon: "🔗", color: "#3B6D11", lessons: [
+      { title: "How affiliate marketing actually works", desc: "Commissions, cookies and tracking", time: "20min", status: "active" },
+      { title: "Finding the best affiliate programs", desc: "Amazon, ClickBank, ShareASale and more", time: "25min", status: "locked" },
+      { title: "Choosing products you can actually sell", desc: "How to pick winners not duds", time: "20min", status: "locked" },
+      { title: "Creating content that drives clicks", desc: "Reviews, comparisons and tutorials", time: "30min", status: "locked" },
+      { title: "Getting your first commissions", desc: "Promote in the right places", time: "25min", status: "locked" }
+    ]
+  },
+  dropship: {
+    title: "Start a Dropshipping Store",
+    desc: "Set up a store, find winning products and make your first sale.",
+    icon: "🛒", color: "#E24B4A", lessons: [
+      { title: "What is dropshipping and does it still work?", desc: "Honest overview for beginners", time: "20min", status: "active" },
+      { title: "Setting up Shopify in one afternoon", desc: "Your store live today", time: "30min", status: "locked" },
+      { title: "Finding winning products with AliExpress", desc: "The research method that works", time: "30min", status: "locked" },
+      { title: "Writing product listings that convert", desc: "Images, titles and descriptions", time: "25min", status: "locked" },
+      { title: "Running your first Facebook or TikTok ad", desc: "Small budget, real results", time: "30min", status: "locked" },
+      { title: "Handling orders and customer support", desc: "Keep it simple and scalable", time: "20min", status: "locked" }
+    ]
+  },
+  smm: {
+    title: "Get Paid to Manage Social Media",
+    desc: "Offer social media services and land your first retainer.",
+    icon: "📱", color: "#185FA5", lessons: [
+      { title: "What does a social media manager actually do?", desc: "Your daily tasks and deliverables", time: "20min", status: "active" },
+      { title: "Building a simple portfolio with no clients", desc: "Create spec work that gets you hired", time: "25min", status: "locked" },
+      { title: "Finding small businesses who need help", desc: "Where to look and how to approach them", time: "25min", status: "locked" },
+      { title: "Pricing your SMM packages", desc: "Starter, standard and premium tiers", time: "20min", status: "locked" },
+      { title: "Delivering results and retaining clients", desc: "Keep clients happy and keep getting paid", time: "25min", status: "locked" }
+    ]
+  }
+};
+
+const LESSON_CONTENT = {
+  default: {
+    explanation: `
+      <h3>What you'll learn in this lesson</h3>
+      <p>This lesson gives you a practical, no-fluff breakdown of the topic. By the end you'll have a clear understanding and a concrete action to take today.</p>
+      <div class="highlight-box"><p>Every lesson on SkillPay follows the same structure: understand it, do it, test it, reflect on it. This is how real learning happens.</p></div>
+      <h3>The core concept</h3>
+      <p>Most people fail at making money online because they overcomplicate things. They spend weeks planning instead of doing. The key insight is simple: start small, prove the concept works for you, then scale.</p>
+      <ul>
+        <li>Pick one method and stick to it for at least 30 days</li>
+        <li>Focus on your first $1 before thinking about $1,000</li>
+        <li>Take action before you feel ready — readiness is a myth</li>
+        <li>Learn from doing, not from consuming more content</li>
+      </ul>
+      <h3>Why this matters</h3>
+      <p>The internet has made it possible for anyone with a phone and a skill to earn income. The barrier to entry has never been lower. But most people never start because they're waiting for the "perfect" moment.</p>
+      <p>This lesson gives you the foundation to stop waiting and start doing. Your task below is the first step.</p>`,
+    task: {
+      title: "Your task for this lesson",
+      desc: "This is your real-world action step. Don't skip it — the task is where the actual learning happens.",
+      steps: [
+        "Read through the explanation above carefully and highlight one thing that surprised you",
+        "Write down the ONE income method you're going to focus on for the next 30 days",
+        "Set a 15-minute timer and research 3 people who are already doing it successfully",
+        "Post your choice in the notes box below to hold yourself accountable"
+      ]
+    },
+    quiz: [
+      { q: "What is the most common reason beginners fail to make money online?", opts: ["Lack of money to invest", "Overcomplicating and not taking action", "Not having the right skills", "Bad luck"], answer: 1 },
+      { q: "According to this lesson, what should you focus on first?", opts: ["Making $1,000", "Building a large audience", "Making your first $1", "Creating a perfect plan"], answer: 2 },
+      { q: "How long should you stick with one method before switching?", opts: ["1 week", "3 days", "At least 30 days", "6 months"], answer: 2 }
+    ],
+    reflection: {
+      prompt: "Reflection helps you retain what you've learned and apply it to your own situation. Take 2 minutes to answer these questions honestly.",
+      questions: [
+        "What was the most useful thing you learned in this lesson?",
+        "What is one thing you're going to do differently after this lesson?",
+        "What's your biggest fear about getting started, and how will you overcome it?"
+      ]
+    }
+  }
+};
+
+let currentCourse = null;
+let currentLessonIndex = 0;
+let selectedQuizAnswers = {};
+
+// ── SCREEN MANAGEMENT ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── FILTER ──
+function filterCourses(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.course-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat.includes(cat)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// ── OPEN COURSE ──
+function openCourse(courseId) {
+  const course = COURSES[courseId];
+  if (!course) return;
+  currentCourse = courseId;
+  document.getElementById('hero-title').textContent = course.title;
+  document.getElementById('hero-desc').textContent = course.desc;
+  document.getElementById('hero-icon').textContent = course.icon;
+  document.getElementById('hero-icon').style.background = course.color + '22';
+  document.getElementById('hero-icon').style.fontSize = '28px';
+  document.getElementById('hero-lessons').innerHTML = 'Lessons: <span>' + course.lessons.length + '</span>';
+  const listEl = document.getElementById('lesson-list-items');
+  listEl.innerHTML = '';
+  course.lessons.forEach((lesson, i) => {
+    const el = document.createElement('div');
+    el.className = 'lesson-item' + (lesson.status === 'active' ? ' current' : '') + (lesson.status === 'locked' ? ' locked' : '');
+    el.innerHTML = `
+      <div class="l-num ${lesson.status === 'done' ? 'done' : lesson.status === 'active' ? 'active' : 'locked'}">
+        ${lesson.status === 'done' ? '✓' : i + 1}
+      </div>
+      <div class="l-info">
+        <div class="l-title">${lesson.title}</div>
+        <div class="l-desc">${lesson.desc}</div>
+      </div>
+      <div class="l-right">
+        <span class="l-time">${lesson.time}</span>
+        <span class="l-tag ${lesson.status === 'done' ? 'done' : lesson.status === 'active' ? 'active' : 'locked'}">
+          ${lesson.status === 'done' ? 'Complete' : lesson.status === 'active' ? 'Start' : 'Locked'}
+        </span>
+      </div>`;
+    if (lesson.status !== 'locked') {
+      el.onclick = () => openLesson(courseId, i);
+    }
+    listEl.appendChild(el);
+  });
+  showScreen('lesson-list');
+}
+
+// ── OPEN LESSON ──
+function openLesson(courseId, index) {
+  currentCourse = courseId;
+  currentLessonIndex = index;
+  const course = COURSES[courseId];
+  const lesson = course.lessons[index];
+  const content = LESSON_CONTENT.default;
+
+  document.getElementById('lesson-breadcrumb').innerHTML = `Courses / <span onclick="showScreen('lesson-list')">${course.title}</span>`;
+  document.getElementById('lesson-title').textContent = `Lesson ${index + 1} — ${lesson.title}`;
+  document.getElementById('video-label').textContent = `Lesson ${index + 1}: ${lesson.title}`;
+
+  const tags = document.getElementById('lesson-tags');
+  tags.innerHTML = `<span class="lesson-tag">${lesson.time}</span><span class="lesson-tag">Beginner</span><span class="lesson-tag">Video + Text</span>`;
+
+  document.getElementById('explanation-body').innerHTML = content.explanation;
+
+  const taskEl = document.getElementById('task-body');
+  taskEl.innerHTML = `
+    <div class="task-card">
+      <h3>${content.task.title}</h3>
+      <p>${content.task.desc}</p>
+      <ul class="task-steps">
+        ${content.task.steps.map((s, i) => `<li><div class="task-step-num">${i+1}</div><span>${s}</span></li>`).join('')}
+      </ul>
+      <textarea class="task-input" placeholder="Write your answer or notes here..."></textarea>
+      <button class="task-submit" onclick="submitTask(this)">Submit task</button>
+    </div>`;
+
+  const quizEl = document.getElementById('quiz-body');
+  selectedQuizAnswers = {};
+  quizEl.innerHTML = content.quiz.map((q, qi) => `
+    <div class="quiz-question">
+      <div class="quiz-q">${qi + 1}. ${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((opt, oi) => `<div class="quiz-opt" onclick="selectAnswer(${qi},${oi},${q.answer},this)">${opt}</div>`).join('')}
+      </div>
+    </div>`).join('') + `
+    <div class="quiz-result" id="quiz-result"></div>
+    <button class="quiz-submit" onclick="submitQuiz()">Check answers</button>`;
+
+  const reflectEl = document.getElementById('reflection-body');
+  reflectEl.innerHTML = `
+    <p class="reflection-prompt">${content.reflection.prompt}</p>
+    ${content.reflection.questions.map((q, i) => `
+      <div class="reflection-q">${i + 1}. ${q}</div>
+      <textarea class="reflect-input" placeholder="Your thoughts..."></textarea>`).join('')}
+    <button class="complete-btn" onclick="completeLesson()">
+      <div class="complete-icon">✓</div>
+      Mark lesson as complete
+    </button>`;
+
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  prevBtn.style.visibility = index === 0 ? 'hidden' : 'visible';
+  nextBtn.textContent = index === course.lessons.length - 1 ? 'Finish course' : 'Next lesson';
+
+  switchTab('explanation', document.querySelector('.tab-btn'));
+  showScreen('lesson');
+}
+
+// ── TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── QUIZ ──
+function selectAnswer(qi, oi, correct, el) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  selectedQuizAnswers[qi] = oi;
+  el.classList.add(oi === correct ? 'correct' : 'wrong');
+  if (oi !== correct) opts[correct].classList.add('correct');
+}
+
+function submitQuiz() {
+  const content = LESSON_CONTENT.default;
+  const total = content.quiz.length;
+  let correct = 0;
+  content.quiz.forEach((q, i) => {
+    if (selectedQuizAnswers[i] === q.answer) correct++;
+  });
+  const result = document.getElementById('quiz-result');
+  result.className = 'quiz-result show ' + (correct === total ? 'pass' : 'fail');
+  result.textContent = correct === total
+    ? `Perfect score! ${correct}/${total} — great work. Move on to the reflection tab.`
+    : `You got ${correct}/${total}. Review the highlighted answers and try again!`;
+}
+
+// ── TASK ──
+function submitTask(btn) {
+  btn.textContent = 'Task submitted ✓';
+  btn.style.background = '#1D9E75';
+  btn.disabled = true;
+}
+
+// ── COMPLETE ──
+function completeLesson() {
+  const course = COURSES[currentCourse];
+  if (currentLessonIndex < course.lessons.length - 1) {
+    course.lessons[currentLessonIndex].status = 'done';
+    if (course.lessons[currentLessonIndex + 1].status === 'locked') {
+      course.lessons[currentLessonIndex + 1].status = 'active';
+    }
+    openLesson(currentCourse, currentLessonIndex + 1);
+  } else {
+    alert('🎉 Course complete! Well done.');
+    showScreen('courses');
+  }
+}
+
+// ── NAV ──
+function navigateLesson(dir) {
+  const course = COURSES[currentCourse];
+  const next = currentLessonIndex + dir;
+  if (next >= 0 && next < course.lessons.length) {
+    if (course.lessons[next].status !== 'locked') {
+      openLesson(currentCourse, next);
+    }
+  }
+}
+</script>
+</body>
+</html>
