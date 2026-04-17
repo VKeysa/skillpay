@@ -190,6 +190,22 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
   .social-section{padding:50px 5%}
   footer{flex-direction:column;gap:10px;text-align:center}
 }
+
+/* DARK MODE */
+[data-theme="dark"]{--cream:#0D1117;--cream-dark:#161B22;--white:#1C2128;--body:#E6EDF3;--muted:#7D8590;--border:#30363D}
+[data-theme="dark"] .how-card,[data-theme="dark"] .price-card,[data-theme="dark"] .testi-card{background:#1C2128;border-color:#30363D}
+[data-theme="dark"] .price-card.featured{background:var(--navy)}
+[data-theme="dark"] .how-card h3,[data-theme="dark"] .section-title,[data-theme="dark"] .how-num,
+[data-theme="dark"] .plan-price .amount,[data-theme="dark"] .plan-name,[data-theme="dark"] .testi-name,
+[data-theme="dark"] .course-meta h4{color:#E6EDF3}
+[data-theme="dark"] .plan-btn.outline{border-color:#30363D;color:#E6EDF3}
+[data-theme="dark"] .plan-btn.outline:hover{border-color:#E6EDF3;background:rgba(255,255,255,0.05)}
+[data-theme="dark"] .social-section{background:#0D1117}
+[data-theme="dark"] .plan-divider{background:#30363D}
+[data-theme="dark"] .plan-features li{color:#C9D1D9}
+.nav-dark-toggle{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:6px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.nav-dark-toggle:hover{border-color:rgba(255,255,255,0.5);color:var(--white)}
+
 </style>
 </head>
 <body>
@@ -433,5 +449,20 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
   <p>&copy; 2025 SkillPay. All rights reserved.</p>
 </footer>
 
+<script>
+function toggleDark(){
+  const d=document.documentElement;
+  const isDark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',isDark?'light':'dark');
+  localStorage.setItem('skillpay_theme',isDark?'light':'dark');
+  const label=document.getElementById('dark-label');
+  if(label)label.textContent=isDark?'Dark':'Light';
+}
+(function(){
+  const t=localStorage.getItem('skillpay_theme');
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
+  document.addEventListener('DOMContentLoaded',function(){const l=document.getElementById('dark-label');if(l)l.textContent='Light';});}
+})();
+</script>
 </body>
 </html>
