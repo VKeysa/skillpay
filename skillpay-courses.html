@@ -615,10 +615,42 @@ function filterCourses(cat, btn) {
   });
 }
 
+// ── SAVE & LOAD PROGRESS ──
+function saveProgress() {
+  const progress = {};
+  for (const [id, c] of Object.entries(COURSES)) {
+    progress[id] = c.lessons.map(l => l.status);
+  }
+  localStorage.setItem('skillpay_progress', JSON.stringify(progress));
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem('skillpay_progress');
+    if (!saved) return;
+    const progress = JSON.parse(saved);
+    for (const [id, statuses] of Object.entries(progress)) {
+      if (COURSES[id]) {
+        statuses.forEach((s, i) => {
+          if (COURSES[id].lessons[i]) COURSES[id].lessons[i].status = s;
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+function getCourseProgress(id) {
+  const c = COURSES[id];
+  const done = c.lessons.filter(l => l.status === 'done').length;
+  return Math.round((done / c.lessons.length) * 100);
+}
+
 function renderCourses() {
   const grid = document.getElementById('courses-grid');
   grid.innerHTML = '';
   for (const [id, c] of Object.entries(COURSES)) {
+    const pct = getCourseProgress(id);
+    const done = c.lessons.filter(l => l.status === 'done').length;
     grid.innerHTML += `<div class="course-card" data-cat="${c.cat}" onclick="openCourse('${id}')">
       <div class="course-thumb" style="background:linear-gradient(135deg,${c.color},${c.color}88)">
         <div class="course-thumb-icon">${c.icon}</div>
@@ -629,8 +661,8 @@ function renderCourses() {
         <div class="course-subject" style="color:${c.color}">${c.subject}</div>
         <div class="course-title">${c.title}</div>
         <div class="course-desc">${c.desc}</div>
-        <div class="course-footer"><div class="course-meta"><span>${c.lessons.length} lessons</span><span>Beginner</span></div><div class="course-rating">★ 4.8</div></div>
-        <div class="prog-mini"><div class="prog-mini-fill" style="width:${id==='hundred'?'35':'0'}%"></div></div>
+        <div class="course-footer"><div class="course-meta"><span>${done}/${c.lessons.length} done</span><span>Beginner</span></div><div class="course-rating">${pct > 0 ? pct + '% complete' : '★ 4.8'}</div></div>
+        <div class="prog-mini"><div class="prog-mini-fill" style="width:${pct}%"></div></div>
       </div></div>`;
   }
 }
@@ -786,10 +818,12 @@ function completeLesson() {
   if (currentLessonIndex < c.lessons.length - 1 && c.lessons[currentLessonIndex + 1].status === 'locked') {
     c.lessons[currentLessonIndex + 1].status = 'active';
   }
+  saveProgress();
   if (currentLessonIndex < c.lessons.length - 1) {
     openLesson(currentCourse, currentLessonIndex + 1);
   } else {
     alert('Course complete! Well done.');
+    renderCourses();
     showScreen('courses');
   }
 }
@@ -802,6 +836,7 @@ function navigateLesson(dir) {
   }
 }
 
+loadProgress();
 renderCourses();
 </script>
 </body>
