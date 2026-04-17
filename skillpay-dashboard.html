@@ -496,7 +496,8 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     document.getElementById('onboarding').classList.add('hidden');
   }
 
-  // ── INCOME TRACKER ──  function getEarnings() {
+  // ── INCOME TRACKER ──
+  function getEarnings() {
     try { return JSON.parse(localStorage.getItem('skillpay_earnings') || '[]'); } catch(e) { return []; }
   }
 
