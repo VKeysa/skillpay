@@ -299,10 +299,14 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         Account
       </div>
     </div>
-        <button class="dark-toggle" onclick="toggleDark()">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <span id="dark-label">Dark mode</span>
-        </button>
+        <div class="theme-switch">
+          <span class="theme-switch-label" id="dark-label">Dark mode</span>
+          <div class="theme-track" onclick="toggleDark()">
+            <svg class="sun-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.8 3.8l1 1M11.2 11.2l1 1M3.8 12.2l1-1M11.2 4.8l1-1" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <svg class="moon-icon" viewBox="0 0 16 16" fill="none"><path d="M13.5 8.5a5.5 5.5 0 01-7-7A5.5 5.5 0 108.5 13.5a5.5 5.5 0 005-5z" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/></svg>
+            <div class="theme-thumb"></div>
+          </div>
+        </div>
       <div class="sidebar-user">
       <div class="user-row">
         <div class="avatar">S</div>
@@ -716,7 +720,7 @@ function toggleDark(){
   d.setAttribute('data-theme',isDark?'light':'dark');
   localStorage.setItem('skillpay_theme',isDark?'light':'dark');
   const label=document.getElementById('dark-label');
-  if(label)label.textContent=isDark?'Dark mode':'Light mode';
+  if(label)label.textContent=isDark?'Light mode':'Dark mode';
 }
 (function(){
   const t=localStorage.getItem('skillpay_theme');
