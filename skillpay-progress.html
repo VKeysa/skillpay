@@ -441,6 +441,13 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         Account
       </div>
     </div>
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="avatar">S</div>
+        <div>
+          <div class="user-name-s" id="side-name">Student</div>
+          <div class="user-plan-s">Free plan</div>
+        </div>
       </div>
     </div>
   </div>
@@ -849,11 +856,7 @@ function toggleDark(){
   const label=document.getElementById('dark-label');
   if(label)label.textContent=isDark?'Light mode':'Dark mode';
 }
-(function(){
-  const t=localStorage.getItem('skillpay_theme');
-  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
-  document.addEventListener('DOMContentLoaded',function(){updateThemeUI(true);});}
-})();
+(function(){const t=localStorage.getItem('skillpay_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();
 </script>
 </body>
 </html>

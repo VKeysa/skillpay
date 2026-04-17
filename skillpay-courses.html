@@ -1368,11 +1368,7 @@ function toggleDark(){
   const labels=document.querySelectorAll('.dark-label-text');
   labels.forEach(function(l){l.textContent=isDark?'Dark mode':'Light mode';});
 }
-(function(){
-  const t=localStorage.getItem('skillpay_theme');
-  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
-  document.addEventListener('DOMContentLoaded',function(){updateThemeUI(true);});}
-})();
+(function(){const t=localStorage.getItem('skillpay_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();
 </script>
 </body>
 </html>
