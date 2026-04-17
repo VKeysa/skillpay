@@ -129,6 +129,36 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   .continue-card{flex-direction:column;align-items:flex-start}
 }
 
+/* GAMIFICATION */
+.xp-card{background:var(--navy);border-radius:14px;padding:22px 26px;margin-bottom:20px}
+.xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.xp-level{display:flex;align-items:center;gap:12px}
+.xp-level-icon{width:44px;height:44px;border-radius:12px;background:rgba(201,147,58,0.15);display:flex;align-items:center;justify-content:center;font-size:22px}
+.xp-level-info h3{font-size:16px;color:var(--white);font-family:'Playfair Display',serif}
+.xp-level-info span{font-size:12px;color:rgba(255,255,255,0.4)}
+.xp-total{text-align:right}
+.xp-total-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--gold);font-weight:700}
+.xp-total-label{font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px}
+.xp-bar-wrap{margin-top:4px}
+.xp-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:5px}
+.xp-bar{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:4px;transition:width 0.5s ease}
+.badges-section{margin-top:24px}
+.badges-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);margin-bottom:14px}
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.badge-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;transition:all 0.2s}
+.badge-card.earned{border-color:var(--gold);background:rgba(201,147,58,0.04)}
+.badge-card.locked{opacity:0.45}
+.badge-icon{font-size:28px;margin-bottom:6px;display:block}
+.badge-name{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:2px}
+.badge-desc{font-size:10px;color:var(--muted);font-weight:300;line-height:1.4}
+.badge-earned-tag{font-size:9px;color:var(--gold);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+.streak-fire{display:flex;align-items:center;gap:4px}
+.xp-notif{position:fixed;top:20px;right:20px;background:var(--navy);color:var(--white);padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:10000;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease,fadeOut 0.3s ease 2.5s forwards;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.xp-notif-gold{color:var(--gold);font-family:'Playfair Display',serif;font-size:18px}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-10px)}}
+
 /* ONBOARDING */
 .onboard-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .onboard-overlay.hidden{display:none}
@@ -287,25 +317,50 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
       <div class="dash-header">
         <div>
           <h2>Good morning, <span id="dash-firstname">there</span></h2>
-          <p>You're on a 5-day streak — keep it up!</p>
+          <p id="dash-streak-text">Start your learning streak today!</p>
         </div>
-        <div class="streak-badge"><div class="streak-dot"></div>5 day streak</div>
+        <div class="streak-badge"><div class="streak-dot"></div><span id="dash-streak-num">0</span> day streak</div>
       </div>
+
+      <!-- XP & LEVEL -->
+      <div class="xp-card">
+        <div class="xp-top">
+          <div class="xp-level">
+            <div class="xp-level-icon" id="xp-level-icon">&#9733;</div>
+            <div class="xp-level-info">
+              <h3 id="xp-level-name">Beginner</h3>
+              <span id="xp-level-sub">Keep learning to level up</span>
+            </div>
+          </div>
+          <div class="xp-total">
+            <div class="xp-total-num" id="xp-total">0</div>
+            <div class="xp-total-label">Total XP</div>
+          </div>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-labels">
+            <span id="xp-current-label">0 XP</span>
+            <span id="xp-next-label">200 XP to next level</span>
+          </div>
+          <div class="xp-bar"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
       <div class="stats-row">
         <div class="stat-card">
+          <div class="s-label">Daily streak</div>
+          <div class="s-val"><span id="stat-streak">0</span> <span style="font-size:16px">days</span></div>
+          <div class="s-sub" id="streak-msg">Log in daily to build your streak</div>
+        </div>
+        <div class="stat-card">
           <div class="s-label">Lessons done</div>
-          <div class="s-val">2</div>
-          <div class="s-sub">of 5 in current course</div>
+          <div class="s-val" id="stat-lessons">0</div>
+          <div class="s-sub">across all courses</div>
         </div>
         <div class="stat-card">
-          <div class="s-label">Course progress</div>
-          <div class="s-val">35%</div>
-          <div class="s-sub">Keep going — halfway soon</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-label">Time learning</div>
-          <div class="s-val">3.2h</div>
-          <div class="s-sub">This week</div>
+          <div class="s-label">Badges earned</div>
+          <div class="s-val" id="stat-badges">0</div>
+          <div class="s-sub" id="stat-badges-sub">Complete actions to earn badges</div>
         </div>
       </div>
       <div class="continue-card">
@@ -351,6 +406,12 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
           <div class="l-info"><div class="l-title locked">Lesson 5 — Build a repeatable system</div><div class="l-desc">Automate and grow your income streams</div></div>
           <div class="l-tag locked">Locked</div>
         </div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="badges-section">
+        <div class="badges-title">Your badges</div>
+        <div class="badges-grid" id="badges-grid"></div>
       </div>
 
       <!-- INCOME TRACKER -->
@@ -496,6 +557,170 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     document.getElementById('onboarding').classList.add('hidden');
   }
 
+  // ── GAMIFICATION ENGINE ──
+  const LEVELS = [
+    { name: 'Beginner', min: 0, max: 199, icon: '&#9733;', sub: 'Just getting started' },
+    { name: 'Apprentice', min: 200, max: 499, icon: '&#9733;&#9733;', sub: 'Building momentum' },
+    { name: 'Hustler', min: 500, max: 999, icon: '&#128293;', sub: 'Making moves' },
+    { name: 'Pro', min: 1000, max: 1999, icon: '&#9889;', sub: 'Serious earner' },
+    { name: 'Master', min: 2000, max: 99999, icon: '&#128081;', sub: 'Legendary status' }
+  ];
+
+  const BADGES = [
+    { id: 'first_lesson', name: 'First Steps', desc: 'Complete your first lesson', icon: '&#128218;', check: (d) => d.lessonsCompleted >= 1 },
+    { id: 'five_lessons', name: 'Fast Learner', desc: 'Complete 5 lessons', icon: '&#127941;', check: (d) => d.lessonsCompleted >= 5 },
+    { id: 'ten_lessons', name: 'Knowledge Seeker', desc: 'Complete 10 lessons', icon: '&#128640;', check: (d) => d.lessonsCompleted >= 10 },
+    { id: 'twenty_lessons', name: 'Unstoppable', desc: 'Complete 20 lessons', icon: '&#9889;', check: (d) => d.lessonsCompleted >= 20 },
+    { id: 'first_course', name: 'Graduate', desc: 'Finish your first course', icon: '&#127891;', check: (d) => d.coursesCompleted >= 1 },
+    { id: 'three_courses', name: 'Triple Threat', desc: 'Finish 3 courses', icon: '&#127942;', check: (d) => d.coursesCompleted >= 3 },
+    { id: 'quiz_master', name: 'Quiz Master', desc: 'Score 100% on any quiz', icon: '&#129504;', check: (d) => d.perfectQuizzes >= 1 },
+    { id: 'streak_3', name: 'On Fire', desc: '3-day login streak', icon: '&#128293;', check: (d) => d.streak >= 3 },
+    { id: 'streak_7', name: 'Week Warrior', desc: '7-day login streak', icon: '&#129525;', check: (d) => d.streak >= 7 },
+    { id: 'streak_30', name: 'Committed', desc: '30-day login streak', icon: '&#128170;', check: (d) => d.streak >= 30 },
+    { id: 'first_earn', name: 'First Dollar', desc: 'Log your first earning', icon: '&#128176;', check: (d) => d.totalEarned > 0 },
+    { id: 'hundred_earn', name: 'Centurion', desc: 'Earn $100 total', icon: '&#128184;', check: (d) => d.totalEarned >= 100 },
+    { id: 'task_5', name: 'Action Taker', desc: 'Submit 5 tasks', icon: '&#9999;', check: (d) => d.tasksSubmitted >= 5 },
+    { id: 'reflect_5', name: 'Deep Thinker', desc: 'Submit 5 reflections', icon: '&#128161;', check: (d) => d.reflectionsSubmitted >= 5 },
+    { id: 'xp_500', name: 'Rising Star', desc: 'Earn 500 XP', icon: '&#11088;', check: (d) => d.xp >= 500 },
+    { id: 'xp_2000', name: 'Legend', desc: 'Earn 2000 XP', icon: '&#128081;', check: (d) => d.xp >= 2000 }
+  ];
+
+  function getGamification() {
+    try { return JSON.parse(localStorage.getItem('skillpay_gamification') || 'null') || defaultGamification(); }
+    catch(e) { return defaultGamification(); }
+  }
+
+  function defaultGamification() {
+    return { xp: 0, streak: 0, lastActiveDate: null, lessonsCompleted: 0, coursesCompleted: 0, perfectQuizzes: 0, tasksSubmitted: 0, reflectionsSubmitted: 0, earnedBadges: [] };
+  }
+
+  function saveGamification(data) {
+    localStorage.setItem('skillpay_gamification', JSON.stringify(data));
+  }
+
+  function addXP(amount, reason) {
+    const g = getGamification();
+    g.xp += amount;
+    saveGamification(g);
+    showXPNotification(amount, reason);
+    renderGamification();
+    checkBadges();
+  }
+
+  function updateStreak() {
+    const g = getGamification();
+    const today = new Date().toISOString().split('T')[0];
+    if (g.lastActiveDate === today) return;
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if (g.lastActiveDate === yesterday) {
+      g.streak += 1;
+    } else if (g.lastActiveDate !== today) {
+      g.streak = 1;
+    }
+    g.lastActiveDate = today;
+    saveGamification(g);
+    addXP(15, 'Daily login');
+  }
+
+  function showXPNotification(amount, reason) {
+    const existing = document.querySelector('.xp-notif');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'xp-notif';
+    el.innerHTML = `<span class="xp-notif-gold">+${amount} XP</span> ${reason}`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  function getLevel(xp) {
+    for (let i = LEVELS.length - 1; i >= 0; i--) {
+      if (xp >= LEVELS[i].min) return { ...LEVELS[i], index: i };
+    }
+    return { ...LEVELS[0], index: 0 };
+  }
+
+  function renderGamification() {
+    const g = getGamification();
+    const level = getLevel(g.xp);
+    const nextLevel = LEVELS[Math.min(level.index + 1, LEVELS.length - 1)];
+    const xpInLevel = g.xp - level.min;
+    const xpNeeded = level.max - level.min + 1;
+    const pct = Math.min(Math.round((xpInLevel / xpNeeded) * 100), 100);
+
+    const el = (id) => document.getElementById(id);
+    if (el('xp-level-icon')) el('xp-level-icon').innerHTML = level.icon;
+    if (el('xp-level-name')) el('xp-level-name').textContent = level.name;
+    if (el('xp-level-sub')) el('xp-level-sub').textContent = level.sub;
+    if (el('xp-total')) el('xp-total').textContent = g.xp.toLocaleString();
+    if (el('xp-current-label')) el('xp-current-label').textContent = xpInLevel + ' / ' + xpNeeded + ' XP';
+    if (el('xp-next-label')) el('xp-next-label').textContent = level.index < LEVELS.length - 1 ? 'Next: ' + nextLevel.name : 'Max level!';
+    if (el('xp-bar-fill')) el('xp-bar-fill').style.width = pct + '%';
+    if (el('stat-streak')) el('stat-streak').textContent = g.streak;
+    if (el('dash-streak-num')) el('dash-streak-num').textContent = g.streak;
+    if (el('stat-lessons')) el('stat-lessons').textContent = g.lessonsCompleted;
+
+    if (el('dash-streak-text')) {
+      if (g.streak >= 7) el('dash-streak-text').textContent = g.streak + '-day streak — you\'re on fire!';
+      else if (g.streak >= 3) el('dash-streak-text').textContent = g.streak + '-day streak — keep it up!';
+      else if (g.streak >= 1) el('dash-streak-text').textContent = 'You\'re building a streak — come back tomorrow!';
+      else el('dash-streak-text').textContent = 'Start your learning streak today!';
+    }
+    if (el('streak-msg')) {
+      if (g.streak >= 7) el('streak-msg').textContent = 'Incredible consistency!';
+      else if (g.streak >= 3) el('streak-msg').textContent = 'Keep the momentum going!';
+      else el('streak-msg').textContent = 'Log in daily to build your streak';
+    }
+
+    renderBadges(g);
+  }
+
+  function checkBadges() {
+    const g = getGamification();
+    const earnings = getEarnings();
+    const data = { ...g, totalEarned: earnings.reduce((s, e) => s + e.amount, 0) };
+    let newBadge = false;
+    BADGES.forEach(b => {
+      if (!g.earnedBadges.includes(b.id) && b.check(data)) {
+        g.earnedBadges.push(b.id);
+        newBadge = true;
+        showXPNotification(25, 'Badge: ' + b.name);
+        g.xp += 25;
+      }
+    });
+    if (newBadge) {
+      saveGamification(g);
+      renderGamification();
+    }
+    if (document.getElementById('stat-badges')) {
+      document.getElementById('stat-badges').textContent = g.earnedBadges.length;
+    }
+    if (document.getElementById('stat-badges-sub')) {
+      document.getElementById('stat-badges-sub').textContent = g.earnedBadges.length + ' of ' + BADGES.length + ' unlocked';
+    }
+  }
+
+  function renderBadges(g) {
+    const grid = document.getElementById('badges-grid');
+    if (!grid) return;
+    grid.innerHTML = BADGES.map(b => {
+      const earned = g.earnedBadges.includes(b.id);
+      return `<div class="badge-card ${earned ? 'earned' : 'locked'}">
+        <span class="badge-icon">${b.icon}</span>
+        <div class="badge-name">${b.name}</div>
+        <div class="badge-desc">${b.desc}</div>
+        ${earned ? '<div class="badge-earned-tag">Earned</div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // Make functions available globally for courses page
+  window.addXP = addXP;
+  window.getGamification = getGamification;
+  window.saveGamification = saveGamification;
+  window.checkBadges = checkBadges;
+  window.renderGamification = renderGamification;
+  window.updateStreak = updateStreak;
+
   // ── INCOME TRACKER ──
   function getEarnings() {
     try { return JSON.parse(localStorage.getItem('skillpay_earnings') || '[]'); } catch(e) { return []; }
@@ -528,6 +753,8 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     document.getElementById('earn-notes').value = '';
     toggleAddForm();
     renderEarnings();
+    checkBadges();
+    addXP(10, 'Logged an earning');
   }
 
   function deleteEarning(id) {
@@ -609,7 +836,12 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   }
 
   // Render on load
-  document.addEventListener('DOMContentLoaded', function() { renderEarnings(); });
+  document.addEventListener('DOMContentLoaded', function() {
+    renderEarnings();
+    updateStreak();
+    renderGamification();
+    checkBadges();
+  });
 </script>
 
 <script type="module">

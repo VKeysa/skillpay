@@ -190,6 +190,7 @@ textarea.reflect-input:focus{border-color:var(--gold)}
   .sidebar{height:auto;position:relative}
 }
 @media(max-width:600px){.courses-grid{grid-template-columns:1fr}}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* CERTIFICATE MODAL */
 .cert-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
@@ -376,6 +377,32 @@ textarea.reflect-input:focus{border-color:var(--gold)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const API_KEY = "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";
+
+// ── GAMIFICATION (shared with dashboard) ──
+function getGamification() {
+  try { return JSON.parse(localStorage.getItem('skillpay_gamification') || 'null') || { xp: 0, streak: 0, lastActiveDate: null, lessonsCompleted: 0, coursesCompleted: 0, perfectQuizzes: 0, tasksSubmitted: 0, reflectionsSubmitted: 0, earnedBadges: [] }; }
+  catch(e) { return { xp: 0, streak: 0, lastActiveDate: null, lessonsCompleted: 0, coursesCompleted: 0, perfectQuizzes: 0, tasksSubmitted: 0, reflectionsSubmitted: 0, earnedBadges: [] }; }
+}
+function saveGamification(d) { localStorage.setItem('skillpay_gamification', JSON.stringify(d)); }
+function addXP(amount, reason) {
+  const g = getGamification(); g.xp += amount; saveGamification(g);
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:20px;right:20px;background:#0D1B2A;color:#fff;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:10000;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  el.innerHTML = `<span style="color:#C9933A;font-family:'Playfair Display',serif;font-size:18px">+${amount} XP</span> ${reason}`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.transition='opacity 0.3s'; el.style.opacity='0'; setTimeout(() => el.remove(), 300); }, 2500);
+}
+// Track daily activity
+(function() {
+  const g = getGamification();
+  const today = new Date().toISOString().split('T')[0];
+  if (g.lastActiveDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    g.streak = (g.lastActiveDate === yesterday) ? g.streak + 1 : 1;
+    g.lastActiveDate = today;
+    saveGamification(g);
+  }
+})();
 
 async function callAI(prompt) {
   try {
@@ -828,6 +855,11 @@ function submitQuiz() {
   const r = document.getElementById('quiz-result');
   r.className = 'quiz-result show ' + (pct >= 70 ? 'pass' : 'fail');
   r.innerHTML = `<div class="quiz-score">${correct}/${quizzes.length} (${pct}%)</div>${pct >= 70 ? 'Great job! You passed. Move on to the Reflection tab.' : 'You need 70% to pass. Review the correct answers and try again.'}`;
+  if (pct >= 70) {
+    const g = getGamification();
+    if (pct === 100) { g.perfectQuizzes = (g.perfectQuizzes || 0) + 1; saveGamification(g); addXP(50, 'Perfect quiz score!'); }
+    else { addXP(30, 'Quiz passed!'); }
+  }
 }
 
 async function submitTask() {
@@ -845,6 +877,8 @@ async function submitTask() {
   }
   fb.classList.add('visible');
   btn.textContent = 'Submitted ✓'; btn.style.background = '#1D9E75';
+  const g = getGamification(); g.tasksSubmitted = (g.tasksSubmitted || 0) + 1; saveGamification(g);
+  addXP(20, 'Task submitted');
 }
 
 async function submitReflection(n, lessonTitle) {
@@ -865,6 +899,8 @@ async function submitReflection(n, lessonTitle) {
     fb.classList.add('visible');
   }
   btn.textContent = 'Saved ✓'; btn.style.color = '#1D9E75'; btn.style.borderColor = '#1D9E75';
+  const g = getGamification(); g.reflectionsSubmitted = (g.reflectionsSubmitted || 0) + 1; saveGamification(g);
+  addXP(10, 'Reflection submitted');
 }
 
 function completeLesson() {
@@ -874,9 +910,16 @@ function completeLesson() {
     c.lessons[currentLessonIndex + 1].status = 'active';
   }
   saveProgress();
+  const g = getGamification();
+  g.lessonsCompleted = (g.lessonsCompleted || 0) + 1;
+  saveGamification(g);
+  addXP(50, 'Lesson completed!');
   if (currentLessonIndex < c.lessons.length - 1) {
     openLesson(currentCourse, currentLessonIndex + 1);
   } else {
+    g.coursesCompleted = (g.coursesCompleted || 0) + 1;
+    saveGamification(g);
+    addXP(100, 'Course completed!');
     showCertificate(currentCourse);
   }
 }
