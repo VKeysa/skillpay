@@ -128,9 +128,48 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   .stats-row{grid-template-columns:1fr 1fr}
   .continue-card{flex-direction:column;align-items:flex-start}
 }
+
+/* ONBOARDING */
+.onboard-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.onboard-overlay.hidden{display:none}
+.onboard-card{background:var(--white);border-radius:18px;max-width:480px;width:90%;overflow:hidden;animation:scaleIn 0.3s ease}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.onboard-top{padding:36px 32px 20px;text-align:center}
+.onboard-icon{width:64px;height:64px;border-radius:16px;background:rgba(201,147,58,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px}
+.onboard-top h2{font-size:24px;color:var(--navy);margin-bottom:8px}
+.onboard-top p{font-size:14px;color:var(--muted);font-weight:300;line-height:1.7;max-width:360px;margin:0 auto}
+.onboard-goals{display:flex;flex-direction:column;gap:10px;padding:0 32px;margin-top:8px}
+.goal-opt{padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--body);cursor:pointer;transition:all 0.15s;text-align:left;background:var(--white);font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:12px}
+.goal-opt:hover{border-color:var(--gold);background:rgba(201,147,58,0.04)}
+.goal-opt.selected{border-color:var(--gold);background:rgba(201,147,58,0.08)}
+.goal-icon{width:36px;height:36px;border-radius:8px;background:rgba(201,147,58,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.onboard-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 32px;margin-top:8px}
+.onboard-feat{background:var(--cream);border-radius:10px;padding:16px;text-align:center}
+.onboard-feat-icon{font-size:22px;margin-bottom:6px}
+.onboard-feat-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.onboard-feat-desc{font-size:11px;color:var(--muted);font-weight:300}
+.onboard-dots{display:flex;justify-content:center;gap:6px;padding:20px}
+.onboard-dot{width:8px;height:8px;border-radius:50%;background:var(--cream-dark);transition:all 0.2s}
+.onboard-dot.active{background:var(--gold);width:20px;border-radius:4px}
+.onboard-bottom{padding:0 32px 28px;display:flex;gap:10px}
+.onboard-btn{flex:1;padding:13px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none}
+.onboard-btn.primary{background:var(--navy);color:var(--white)}
+.onboard-btn.primary:hover{background:var(--gold)}
+.onboard-btn.ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.onboard-btn.ghost:hover{border-color:var(--navy);color:var(--navy)}
 </style>
 </head>
 <body>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="onboard-overlay hidden" id="onboarding">
+  <div class="onboard-card">
+    <div class="onboard-top" id="onboard-top"></div>
+    <div id="onboard-middle"></div>
+    <div class="onboard-dots" id="onboard-dots"></div>
+    <div class="onboard-bottom" id="onboard-bottom"></div>
+  </div>
+</div>
 
 
 <!-- LOGIN -->
@@ -399,7 +438,64 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
 </div>
 <!-- INCOME TRACKER -->
 <script>
-  function getEarnings() {
+  // ── ONBOARDING ──
+  let onboardStep = 0;
+  const onboardSteps = [
+    {
+      top: '<div class="onboard-icon"><span style="font-size:28px">&#9733;</span></div><h2>Welcome to SkillPay!</h2><p>You just took the first step toward earning your first income online. Let us show you around — it only takes 30 seconds.</p>',
+      middle: '',
+      buttons: [{ text: "Show me around", cls: "primary", action: "nextOnboard()" }]
+    },
+    {
+      top: '<div class="onboard-icon"><span style="font-size:24px">&#127919;</span></div><h2>What\'s your goal?</h2><p>This helps us recommend the best course for you.</p>',
+      middle: '<div class="onboard-goals"><button class="goal-opt" onclick="selectGoal(this)"><div class="goal-icon">$</div><div><strong>Make my first $100 online</strong><br><span style="font-size:12px;color:#7A8A9A">I\'m a complete beginner</span></div></button><button class="goal-opt" onclick="selectGoal(this)"><div class="goal-icon">&#9998;</div><div><strong>Start freelancing</strong><br><span style="font-size:12px;color:#7A8A9A">I have a skill I want to monetize</span></div></button><button class="goal-opt" onclick="selectGoal(this)"><div class="goal-icon">&#9654;</div><div><strong>Grow my social media</strong><br><span style="font-size:12px;color:#7A8A9A">I want to build an audience</span></div></button><button class="goal-opt" onclick="selectGoal(this)"><div class="goal-icon">&#9650;</div><div><strong>Learn about investing</strong><br><span style="font-size:12px;color:#7A8A9A">I want my money to grow</span></div></button></div>',
+      buttons: [{ text: "Continue", cls: "primary", action: "nextOnboard()" }]
+    },
+    {
+      top: '<div class="onboard-icon"><span style="font-size:24px">&#9889;</span></div><h2>Here\'s what you get</h2><p>Everything you need to go from zero to earning.</p>',
+      middle: '<div class="onboard-features"><div class="onboard-feat"><div class="onboard-feat-icon">&#128218;</div><div class="onboard-feat-title">9 courses</div><div class="onboard-feat-desc">Freelancing, content, crypto, coding and more</div></div><div class="onboard-feat"><div class="onboard-feat-icon">&#9999;</div><div class="onboard-feat-title">Real tasks</div><div class="onboard-feat-desc">Hands-on actions after every lesson</div></div><div class="onboard-feat"><div class="onboard-feat-icon">&#128202;</div><div class="onboard-feat-title">Income tracker</div><div class="onboard-feat-desc">Log every dollar you earn</div></div><div class="onboard-feat"><div class="onboard-feat-icon">&#129302;</div><div class="onboard-feat-title">AI tutor</div><div class="onboard-feat-desc">Get feedback on your work</div></div></div>',
+      buttons: [{ text: "Let's start learning!", cls: "primary", action: "finishOnboard()" }]
+    }
+  ];
+
+  function showOnboarding(userName) {
+    if (localStorage.getItem('skillpay_onboarded')) return;
+    const name = (userName || 'there').split(' ')[0];
+    onboardSteps[0].top = `<div class="onboard-icon"><span style="font-size:28px">&#9733;</span></div><h2>Welcome, ${name}!</h2><p>You just took the first step toward earning your first income online. Let us show you around — it only takes 30 seconds.</p>`;
+    onboardStep = 0;
+    document.getElementById('onboarding').classList.remove('hidden');
+    renderOnboardStep();
+  }
+
+  function renderOnboardStep() {
+    const step = onboardSteps[onboardStep];
+    document.getElementById('onboard-top').innerHTML = step.top;
+    document.getElementById('onboard-middle').innerHTML = step.middle;
+    document.getElementById('onboard-dots').innerHTML = onboardSteps.map((_, i) =>
+      `<div class="onboard-dot ${i === onboardStep ? 'active' : ''}"></div>`
+    ).join('');
+    document.getElementById('onboard-bottom').innerHTML = step.buttons.map(b =>
+      `<button class="onboard-btn ${b.cls}" onclick="${b.action}">${b.text}</button>`
+    ).join('');
+  }
+
+  function selectGoal(el) {
+    document.querySelectorAll('.goal-opt').forEach(g => g.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function nextOnboard() {
+    onboardStep++;
+    if (onboardStep < onboardSteps.length) renderOnboardStep();
+    else finishOnboard();
+  }
+
+  function finishOnboard() {
+    localStorage.setItem('skillpay_onboarded', 'true');
+    document.getElementById('onboarding').classList.add('hidden');
+  }
+
+  // ── INCOME TRACKER ──  function getEarnings() {
     try { return JSON.parse(localStorage.getItem('skillpay_earnings') || '[]'); } catch(e) { return []; }
   }
 
@@ -564,6 +660,10 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
       avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
     } else {
       avatarEl.textContent = firstName.charAt(0).toUpperCase();
+    }
+    // Show onboarding for new users
+    if (typeof showOnboarding === 'function') {
+      showOnboarding(user.displayName || user.email);
     }
   }
 
