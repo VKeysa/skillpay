@@ -155,8 +155,8 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
 [data-theme="dark"] .save-btn,[data-theme="dark"] .auth-btn{background:#C9933A}
 [data-theme="dark"] .save-btn:hover,[data-theme="dark"] .auth-btn:hover{background:#E8B86D}
 [data-theme="dark"] .danger-btn{border-color:#F85149;color:#F85149}
-.dark-toggle{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;transition:all 0.15s;margin-top:8px;border:none;background:none;width:100%}
-.dark-toggle:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.dark-toggle{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.15s;margin:8px 12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);width:calc(100% - 24px)}
+.dark-toggle:hover{background:rgba(255,255,255,0.1);color:var(--white);border-color:rgba(255,255,255,0.25)}
 
 </style>
 </head>
@@ -187,7 +187,11 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         Account
       </div>
     </div>
-    <div class="sidebar-user">
+        <button class="dark-toggle" onclick="toggleDark()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span id="dark-label">Dark mode</span>
+        </button>
+      <div class="sidebar-user">
       <div class="user-row">
         <div class="avatar" id="side-avatar">?</div>
         <div>
