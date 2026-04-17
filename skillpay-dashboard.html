@@ -582,6 +582,13 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
           Account
         </div>
       </div>
+      <div class="sidebar-user">
+        <div class="user-row">
+          <div class="avatar" id="user-avatar">?</div>
+          <div>
+            <div class="user-name" id="user-name">Loading...</div>
+            <div class="user-plan">Free plan</div>
+          </div>
         </div>
         <button class="logout-btn" style="background:rgba(201,147,58,0.15);border-color:rgba(201,147,58,0.3);color:#E8B86D;margin-bottom:6px" onclick="window.open('https://buy.stripe.com/test_5kQdR1dDEgF08ya63Qew800','_blank')">Upgrade to Student — $6.99/mo</button>
         <button class="logout-btn" onclick="doSignOut()">Sign out</button>
@@ -1265,18 +1272,9 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   }
 </script>
 <script>
-function toggleDark(){
-  const d=document.documentElement;
-  const isDark=d.getAttribute('data-theme')==='dark';
-  d.setAttribute('data-theme',isDark?'light':'dark');
-  localStorage.setItem('skillpay_theme',isDark?'light':'dark');
-  const label=document.getElementById('dark-label');
-  if(label)label.textContent=isDark?'Light mode':'Dark mode';
-}
 (function(){
   const t=localStorage.getItem('skillpay_theme');
-  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');
-  document.addEventListener('DOMContentLoaded',function(){updateThemeUI(true);});}
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}
 })();
 </script>
 </body>
