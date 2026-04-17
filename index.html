@@ -21,7 +21,7 @@
   --text-body:#2C3E50;
   --border:#DDD8CE;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-body);line-height:1.6;font-size:16px}
+html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-body);line-height:1.6;font-size:16px}
 h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
 
 /* NAV */
@@ -170,8 +170,25 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
 @media(max-width:768px){
   .hero-inner,.course-inner{grid-template-columns:1fr}
   .how-grid,.pricing-grid,.testimonials{grid-template-columns:1fr}
-  .hero h1{font-size:32px}
+  .hero h1{font-size:28px}
   .hero-card{display:none}
+  .hero{padding:50px 5% 60px}
+  .hero p{font-size:15px}
+  .hero-stats{flex-wrap:wrap;gap:20px}
+  .hero-actions{flex-direction:column}
+  .hero-actions button{width:100%}
+  nav{padding:0 4%}
+  .nav-links a{display:none}
+  .section{padding:50px 5%}
+  .section-title{font-size:28px}
+  .course-section{padding:50px 5%}
+  .course-inner h2{font-size:28px}
+  .pricing-section{padding:50px 5%}
+  .price-card{padding:24px 20px}
+  .cta-section{padding:60px 5%}
+  .cta-section h2{font-size:30px}
+  .social-section{padding:50px 5%}
+  footer{flex-direction:column;gap:10px;text-align:center}
 }
 </style>
 </head>
@@ -181,9 +198,9 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
 <nav>
   <div class="nav-logo">Skill<span>Pay</span></div>
   <div class="nav-links">
-    <a href="#">Courses</a>
-    <a href="#">Pricing</a>
-    <a href="#">About</a>
+    <a href="skillpay-courses.html">Courses</a>
+    <a href="#pricing" onclick="event.preventDefault();document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</a>
+    <a href="#testimonials" onclick="event.preventDefault();document.getElementById('testimonials').scrollIntoView({behavior:'smooth'})">Reviews</a>
     <button class="nav-cta" onclick="window.location.href='skillpay-dashboard.html'">Get started free</button>
   </div>
 </nav>
@@ -313,7 +330,7 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
 </section>
 
 <!-- PRICING -->
-<section class="pricing-section">
+<section class="pricing-section" id="pricing">
   <div class="pricing-inner">
     <div style="text-align:center">
       <div class="section-label">Pricing</div>
@@ -369,7 +386,7 @@ footer p{font-size:12px;color:rgba(255,255,255,0.2)}
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="social-section">
+<section class="social-section" id="testimonials">
   <div class="social-inner">
     <div class="section-label">What students say</div>
     <h2 class="section-title">Real results from real learners</h2>

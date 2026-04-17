@@ -333,9 +333,41 @@ async function callAI(prompt) {
       headers: { "Content-Type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1500, messages: [{ role: "user", content: prompt }] })
     });
+    if (!res.ok) return null;
     const data = await res.json();
-    return data.content?.[0]?.text || "Unable to generate response.";
-  } catch(e) { return "AI is temporarily unavailable. Please try again."; }
+    return data.content?.[0]?.text || null;
+  } catch(e) { return null; }
+}
+
+const LESSON_CONTENT = {
+  hundred: [
+    { exp: '<h3>Finding your first income opportunity</h3><p>The internet offers dozens of ways to earn money, but as a beginner, you need to pick just one. The most common mistake is trying to do everything at once — freelancing, dropshipping, content creation, and crypto all at the same time. That leads to burnout and zero results.</p><div class="highlight-box"><p>The fastest path to your first $100 is picking ONE method and giving it 30 days of focused effort before judging whether it works.</p></div><h3>The top beginner-friendly methods</h3><ul><li><strong>Freelancing:</strong> Sell a skill you already have (writing, design, video editing, data entry) on platforms like Fiverr or Upwork</li><li><strong>Selling digital products:</strong> Create a simple template, guide or checklist and sell it on Gumroad</li><li><strong>Social media management:</strong> Help small businesses post content for $300-500/month</li><li><strong>Affiliate marketing:</strong> Promote products you use and earn commissions</li></ul><h3>How to choose your method</h3><p>Ask yourself three questions: What can I do today without learning a new skill? What do people already ask me for help with? Which method excites me enough to stick with it for 30 days?</p><p>Don\'t overthink this. The goal isn\'t to find the perfect method — it\'s to start. You can always pivot later once you understand how online income works.</p>',
+      task: { title: "Find your income opportunity", desc: "Identify the ONE method you'll focus on for the next 30 days.", steps: ["List 3 skills you already have (even basic ones like writing, organizing, social media)", "Search Fiverr and Upwork for gigs related to those skills — are people paying for them?", "Pick the ONE method that matches your skills and has demand", "Write down your choice and why you picked it"] },
+      reflect: ["What skill or experience do you already have that could be monetized online?", "What's your biggest fear about getting started, and is it actually realistic?", "If you had to make $100 in the next 14 days, which method would you choose and why?", "What's one thing you've been overthinking that you could just start doing today?", "Who is someone already doing what you want to do? What can you learn from them?"] },
+    { exp: '<h3>Why your digital presence matters</h3><p>Before anyone pays you, they need to trust you. Your digital presence is how strangers decide whether you\'re worth hiring or buying from. This doesn\'t mean you need a fancy website — it means you need a clear, professional profile that says "I can solve your problem."</p><div class="highlight-box"><p>Your profile is your storefront. If it\'s empty or confusing, people walk right past. If it\'s clear and specific, they stop and buy.</p></div><h3>Setting up your profile</h3><p>Whether you\'re on Fiverr, Upwork, LinkedIn, or Gumroad, your profile needs three things: a clear headline that says what you do, a description that explains who you help and how, and proof that you can deliver (even if it\'s sample work you created yourself).</p><h3>Creating your first offer</h3><ul><li>Be specific: "I will write 500-word blog posts about health and fitness" beats "I can write stuff"</li><li>Price competitively to start: Your first goal is getting reviews, not maximizing profit</li><li>Include a clear deliverable: What exactly does the buyer get?</li><li>Set realistic timelines: Under-promise and over-deliver</li></ul>',
+      task: { title: "Build your profile and first offer", desc: "Create a professional profile that attracts your first buyer.", steps: ["Choose your platform (Fiverr, Upwork, Gumroad, or LinkedIn)", "Write a headline: 'I will [specific service] for [specific audience]'", "Write a 3-sentence bio: Who you are, what you do, why someone should hire you", "Create one offer/gig with a clear price, deliverable, and timeline", "Ask one friend to review your profile and give honest feedback"] },
+      reflect: ["How does your profile compare to the top 3 profiles in your niche?", "What would make a stranger trust you enough to pay you?", "What's the minimum you'd charge to get your first client, and why?", "How would you describe what you do in one sentence to a friend?", "What's one thing you could add to your profile tomorrow to make it stronger?"] },
+    { exp: '<h3>Getting your first sale is a numbers game</h3><p>Most beginners wait for clients to come to them. That never works when you\'re starting from zero. You need to actively reach out, pitch, and follow up. The good news? You only need ONE person to say yes.</p><div class="highlight-box"><p>On average, it takes 10-20 outreach messages to land your first client. Most people give up after 3. Don\'t be most people.</p></div><h3>Where to find potential clients</h3><ul><li>Respond to job posts on Fiverr, Upwork, and freelance job boards</li><li>DM small businesses on Instagram that have bad content or no website</li><li>Post in Facebook groups and Reddit communities where your audience hangs out</li><li>Tell everyone in your personal network what you\'re offering</li></ul><h3>How to pitch without being annoying</h3><p>A good pitch is short, specific, and focused on their problem — not your resume. Example: "Hey, I noticed your Instagram hasn\'t posted in 2 weeks. I help small restaurants create content that brings in customers. Want me to create 3 sample posts for free so you can see the quality?"</p><p>The free sample approach works incredibly well for beginners because it removes all risk for the buyer.</p>',
+      task: { title: "Land your first client or sale", desc: "Put yourself out there and make your first pitch.", steps: ["Identify 10 potential clients or buyers for your service/product", "Write a personalized pitch template (keep it under 5 sentences)", "Send your pitch to all 10 people today", "Track who responds and follow up after 48 hours with anyone who hasn't replied", "If someone says yes, deliver exceptional quality to earn your first review", "Post in 2 relevant online communities about what you offer"] },
+      reflect: ["What's the worst that could happen if your pitch gets rejected?", "How did it feel to actually send your first outreach message?", "What did you learn from any responses (or lack of responses) you received?", "How would you improve your pitch based on the reactions you got?", "What would you do differently if you had to find 10 clients instead of 1?"] },
+    { exp: '<h3>From $100 to consistent income</h3><p>Making your first $100 proves the concept works. Now the question is: can you do it again? The answer is yes — but you need systems, not hustle. Consistent income comes from repeatable processes, not one-off wins.</p><div class="highlight-box"><p>The difference between someone who makes $100 once and someone who makes $1,000/month is systems. Systemize what worked, cut what didn\'t.</p></div><h3>Building your system</h3><ul><li>Document what worked: Which platform? Which pitch? Which service?</li><li>Create templates for your most common tasks</li><li>Set a daily routine: 30 min outreach, 2 hours delivery, 30 min learning</li><li>Track your numbers: How many pitches = 1 client? What\'s your average order value?</li></ul><h3>Raising your prices</h3><p>After 3-5 completed projects with good reviews, raise your prices by 25-50%. The clients who only wanted cheap work will leave. Better clients who value quality will stay and refer others.</p>',
+      task: { title: "Build your scaling system", desc: "Create a repeatable process to grow beyond $100.", steps: ["Write down exactly what worked to get your first sale", "Create a template for your outreach pitch", "Set up a simple spreadsheet to track: pitches sent, responses, conversions, revenue", "Block 2 hours per day in your calendar for your income activity", "Raise your price by 25% for your next client"] },
+      reflect: ["What was the single most effective thing you did to earn your first income?", "What would you need to change to go from $100/month to $500/month?", "How much time per day are you realistically willing to invest?", "What's one task you keep repeating that you could templatize?", "Where do you see yourself with this income stream in 90 days?"] },
+    { exp: '<h3>Automation and growth</h3><p>At this stage, you\'ve proven you can make money online consistently. Now it\'s time to work smarter. Automation doesn\'t mean replacing yourself with robots — it means eliminating repetitive tasks so you can focus on what actually makes money.</p><div class="highlight-box"><p>Every hour you spend on admin work is an hour you\'re not spending on income-generating activities. Automate or eliminate the admin.</p></div><h3>What to automate first</h3><ul><li>Email responses: Create templates for common client questions</li><li>Invoicing: Use free tools like Wave or PayPal automatic invoicing</li><li>Social media: Schedule a week of content in one sitting using Buffer</li><li>Client onboarding: Create a standard welcome message and questionnaire</li></ul><h3>Growing beyond yourself</h3><p>Once you\'re consistently earning $500+/month, consider outsourcing the lowest-value tasks. Hire a VA for $3-5/hour to handle admin while you focus on getting more clients and delivering better work.</p>',
+      task: { title: "Set up your first automation", desc: "Eliminate one repetitive task from your workflow.", steps: ["List every task you do weekly for your online income", "Identify the 3 most repetitive, low-value tasks", "Set up one automation: email template, scheduling tool, or invoice template", "Calculate how many hours per week this saves you", "Use that freed-up time for one more income-generating activity"] },
+      reflect: ["Which task in your workflow takes the most time but generates the least income?", "If you could only work 2 hours per day on your business, what would you focus on?", "What's stopping you from raising your prices right now?", "How would your business look if you had 10 clients instead of 1-2?", "What's your income goal for 6 months from now, and what needs to happen to get there?"] }
+  ]
+};
+
+function getDefaultContent(courseId, lessonIndex) {
+  const content = LESSON_CONTENT[courseId];
+  if (content && content[lessonIndex]) return content[lessonIndex];
+  const c = COURSES[courseId], l = c.lessons[lessonIndex];
+  return {
+    exp: `<h3>What you'll learn</h3><p>In this lesson, you'll get a practical, no-fluff breakdown of "${l.title}". By the end, you'll have a clear understanding and a concrete action to take today.</p><div class="highlight-box"><p>Every lesson on SkillPay follows the same structure: understand it, do it, test it, reflect on it. This is how real learning happens.</p></div><h3>The core concept</h3><p>${l.desc}. This is one of the most important skills you'll learn in the "${c.title}" course. Most people fail because they overcomplicate things — the key is to start simple and improve as you go.</p><ul><li>Focus on one thing at a time and master it before moving on</li><li>Take action before you feel ready — readiness is a myth</li><li>Learn by doing, not by watching more videos</li><li>Track your progress so you can see how far you've come</li></ul><h3>Putting it into practice</h3><p>The task tab has a specific action for you to complete. Don't skip it — the task is where the real learning happens. Then test your knowledge with the quiz, and finish with the reflection to cement what you've learned.</p>`,
+    task: { title: "Apply what you've learned", desc: "Complete this hands-on task to put the lesson into practice.", steps: ["Review the key concepts from the explanation above", "Research 3 real-world examples of this concept in action", "Apply the main technique to your own situation", "Document what you did and what results you got"] },
+    reflect: ["What was the most valuable thing you learned in this lesson?", "How does this lesson connect to what you learned before?", "What's one thing you'll do differently after this lesson?", "What questions do you still have about this topic?", "How will you apply this knowledge in the next 7 days?"]
+  };
 }
 
 const COURSES = {
@@ -628,58 +660,46 @@ function openCourse(id) {
 async function openLesson(courseId, index) {
   currentCourse = courseId; currentLessonIndex = index;
   const c = COURSES[courseId], l = c.lessons[index];
+  const content = getDefaultContent(courseId, index);
+  
   document.getElementById('lesson-breadcrumb').innerHTML = `Courses / <span onclick="showScreen('lesson-list')">${c.title}</span>`;
   document.getElementById('lesson-title').textContent = `Lesson ${index + 1} — ${l.title}`;
   document.getElementById('video-label').textContent = `Lesson ${index + 1}: ${l.title}`;
   document.getElementById('lesson-tags').innerHTML = `<span class="lesson-tag">${l.time}</span><span class="lesson-tag">${c.difficulty}</span><span class="lesson-tag">Video + Text</span>`;
 
-  // AI Explanation
-  const expEl = document.getElementById('explanation-body');
-  expEl.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div>AI is generating your lesson content...</div>';
-  switchTab('explanation', document.querySelector('.tab-btn'));
-  showScreen('lesson');
+  // Explanation — use pre-written content immediately
+  document.getElementById('explanation-body').innerHTML = content.exp;
 
-  const expText = await callAI(`You are a teacher for an online learning platform called SkillPay. Write a detailed lesson explanation for the topic: "${l.title}" which is part of the course "${c.title}". The lesson description is: "${l.desc}". Write it in HTML format using <h3> for section headers, <p> for paragraphs, <ul><li> for bullet points, and wrap one key insight in: <div class="highlight-box"><p>KEY INSIGHT HERE</p></div>. Make it practical, actionable, beginner-friendly. Include 3-4 sections. Do NOT include any markdown, just raw HTML tags. Do NOT wrap in code blocks.`);
-  expEl.innerHTML = expText;
-
-  // Task
+  // Task — use pre-written content
   const taskEl = document.getElementById('task-body');
-  taskEl.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div>Generating your task...</div>';
-  const taskText = await callAI(`You are a teacher for SkillPay. Create a practical task for the lesson "${l.title}" in the course "${c.title}". Return ONLY raw HTML (no markdown, no code blocks). Use this format:
-<div class="task-card">
-<h3>TASK TITLE</h3>
-<p>TASK DESCRIPTION</p>
-<ul class="task-steps"><li><div class="task-step-num">1</div><span>STEP TEXT</span></li></ul>
-</div>
-Include 4-6 steps. Make each step specific and actionable for a beginner.`);
-  taskEl.innerHTML = taskText + `
-    <textarea class="task-input" id="task-answer" placeholder="Write your answer or work here... Be detailed — the AI will give you personalized feedback."></textarea>
-    <button class="task-submit" onclick="submitTask()">Submit for AI feedback</button>
-    <div class="ai-feedback" id="task-feedback"></div>`;
+  taskEl.innerHTML = `
+    <div class="task-card">
+      <h3>${content.task.title}</h3>
+      <p>${content.task.desc}</p>
+      <ul class="task-steps">${content.task.steps.map((s, i) => `<li><div class="task-step-num">${i+1}</div><span>${s}</span></li>`).join('')}</ul>
+      <textarea class="task-input" id="task-answer" placeholder="Write your answer or work here... Be detailed for the best feedback."></textarea>
+      <button class="task-submit" onclick="submitTask()">Submit for AI feedback</button>
+      <div class="ai-feedback ai-feedback-dark" id="task-feedback"></div>
+    </div>`;
 
   // Quiz
   const quizzes = c.quizzes[index] || c.quizzes[0];
   selectedQuizAnswers = {};
-  const quizEl = document.getElementById('quiz-body');
-  quizEl.innerHTML = `<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-bar" style="width:0%"></div></div><div class="quiz-progress-text" id="quiz-count">0/${quizzes.length} answered</div></div>` +
+  document.getElementById('quiz-body').innerHTML = `<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-bar" style="width:0%"></div></div><div class="quiz-progress-text" id="quiz-count">0/${quizzes.length} answered</div></div>` +
     quizzes.map((q, qi) => `<div class="quiz-question"><div class="quiz-q">${qi+1}. ${q.q}</div><div class="quiz-options">${q.opts.map((o, oi) => `<div class="quiz-opt" onclick="selectAnswer(${qi},${oi},this)">${o}</div>`).join('')}</div></div>`).join('') +
     `<div class="quiz-result" id="quiz-result"></div><button class="quiz-submit" onclick="submitQuiz()">Check all answers</button>`;
 
-  // Reflection
-  const reflectEl = document.getElementById('reflection-body');
-  reflectEl.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div>Generating reflection questions...</div>';
-  const reflectText = await callAI(`You are a teacher for SkillPay. Generate 5 deep reflection questions for the lesson "${l.title}" in the course "${c.title}". Return ONLY raw HTML (no markdown, no code blocks). Use this format for each question:
-<div class="reflection-q">NUMBER. QUESTION TEXT</div>
-<textarea class="reflect-input" placeholder="Your thoughts..." id="reflect-N"></textarea>
-<button class="reflect-submit" onclick="submitReflection(N, '${l.title.replace(/'/g, "\\'")}')">Get AI feedback</button>
-<div class="ai-feedback" id="reflect-feedback-N"></div>
-Replace N with numbers 0 through 4. Make questions thought-provoking and specific to the lesson topic.`);
-  reflectEl.innerHTML = `<p class="reflection-prompt">Reflection helps you retain what you've learned and apply it to your own situation. Take time to answer each question honestly — the AI will give you personalized feedback.</p>${reflectText}
-    <button class="complete-btn" onclick="completeLesson()"><div class="complete-icon">✓</div>Mark lesson as complete</button>`;
+  // Reflection — use pre-written questions
+  document.getElementById('reflection-body').innerHTML = `<p class="reflection-prompt">Reflection helps you retain what you've learned and apply it to your own situation. Take time to answer each question honestly — if AI credits are available, you'll get personalized feedback.</p>` +
+    content.reflect.map((q, i) => `<div class="reflection-q">${i+1}. ${q}</div><textarea class="reflect-input" placeholder="Your thoughts..." id="reflect-${i}"></textarea><button class="reflect-submit" onclick="submitReflection(${i}, '${l.title.replace(/'/g, "\\'")}')">Get AI feedback</button><div class="ai-feedback" id="reflect-feedback-${i}"></div>`).join('') +
+    `<button class="complete-btn" onclick="completeLesson()"><div class="complete-icon">✓</div>Mark lesson as complete</button>`;
 
   // Nav
   document.getElementById('prev-btn').style.visibility = index === 0 ? 'hidden' : 'visible';
   document.getElementById('next-btn').textContent = index === c.lessons.length - 1 ? 'Finish course' : 'Next lesson';
+
+  switchTab('explanation', document.querySelector('.tab-btn'));
+  showScreen('lesson');
 }
 
 function switchTab(name, btn) {
@@ -731,7 +751,11 @@ async function submitTask() {
   const c = COURSES[currentCourse], l = c.lessons[currentLessonIndex];
   const feedback = await callAI(`You are a supportive but rigorous teacher on SkillPay. A student just submitted their task for the lesson "${l.title}" in the course "${c.title}". Their answer: "${answer}". Give specific, constructive feedback in 3-4 sentences. Point out what they did well, what could be improved, and give one actionable next step. Be encouraging but honest. Return plain text only, no HTML.`);
   const fb = document.getElementById('task-feedback');
-  fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>AI Feedback</div><div class="ai-feedback-text">${feedback}</div>`;
+  if (feedback) {
+    fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>AI Feedback</div><div class="ai-feedback-text">${feedback}</div>`;
+  } else {
+    fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>Task Submitted</div><div class="ai-feedback-text">Your task has been saved! AI feedback will be available once API credits are added. For now, review your work against the lesson objectives and make sure you completed each step.</div>`;
+  }
   fb.classList.add('visible');
   btn.textContent = 'Submitted ✓'; btn.style.background = '#1D9E75';
 }
@@ -746,10 +770,14 @@ async function submitReflection(n, lessonTitle) {
   const feedback = await callAI(`You are a thoughtful mentor on SkillPay. A student reflected on the lesson "${lessonTitle}" in the course "${c.title}". Their reflection: "${answer}". Give warm, insightful feedback in 2-3 sentences. Validate their thinking, add a new perspective, and ask a follow-up question to deepen their understanding. Return plain text only.`);
   const fb = document.getElementById('reflect-feedback-' + n);
   if (fb) {
-    fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>AI Feedback</div><div class="ai-feedback-text">${feedback}</div>`;
+    if (feedback) {
+      fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>AI Feedback</div><div class="ai-feedback-text">${feedback}</div>`;
+    } else {
+      fb.innerHTML = `<div class="ai-feedback-header"><div class="ai-feedback-dot"></div>Reflection Saved</div><div class="ai-feedback-text">Great job reflecting! AI feedback will be available once API credits are added. Keep journaling your thoughts — reflection is one of the most powerful learning tools.</div>`;
+    }
     fb.classList.add('visible');
   }
-  btn.textContent = 'Feedback received ✓'; btn.style.color = '#1D9E75'; btn.style.borderColor = '#1D9E75';
+  btn.textContent = 'Saved ✓'; btn.style.color = '#1D9E75'; btn.style.borderColor = '#1D9E75';
 }
 
 function completeLesson() {
