@@ -386,6 +386,13 @@ function getGamification() {
 function saveGamification(d) { localStorage.setItem('skillpay_gamification', JSON.stringify(d)); }
 function addXP(amount, reason) {
   const g = getGamification(); g.xp += amount; saveGamification(g);
+  // Track daily XP for progress charts
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const days = JSON.parse(localStorage.getItem('skillpay_activity_days') || '{}');
+    days[today] = (days[today] || 0) + amount;
+    localStorage.setItem('skillpay_activity_days', JSON.stringify(days));
+  } catch(e) {}
   const el = document.createElement('div');
   el.style.cssText = 'position:fixed;top:20px;right:20px;background:#0D1B2A;color:#fff;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:10000;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
   el.innerHTML = `<span style="color:#C9933A;font-family:'Playfair Display',serif;font-size:18px">+${amount} XP</span> ${reason}`;
@@ -860,6 +867,14 @@ function submitQuiz() {
     if (pct === 100) { g.perfectQuizzes = (g.perfectQuizzes || 0) + 1; saveGamification(g); addXP(50, 'Perfect quiz score!'); }
     else { addXP(30, 'Quiz passed!'); }
   }
+  // Save quiz score for progress analytics
+  try {
+    const scores = JSON.parse(localStorage.getItem('skillpay_quiz_scores') || '{}');
+    if (!scores[currentCourse] || pct > (scores[currentCourse].bestPct || 0)) {
+      scores[currentCourse] = { bestPct: pct, correct, total: quizzes.length };
+    }
+    localStorage.setItem('skillpay_quiz_scores', JSON.stringify(scores));
+  } catch(e) {}
 }
 
 async function submitTask() {

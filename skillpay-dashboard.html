@@ -602,6 +602,12 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     const g = getGamification();
     g.xp += amount;
     saveGamification(g);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const days = JSON.parse(localStorage.getItem('skillpay_activity_days') || '{}');
+      days[today] = (days[today] || 0) + amount;
+      localStorage.setItem('skillpay_activity_days', JSON.stringify(days));
+    } catch(e) {}
     showXPNotification(amount, reason);
     renderGamification();
     checkBadges();
