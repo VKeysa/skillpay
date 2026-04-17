@@ -663,8 +663,8 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
       avatarEl.textContent = firstName.charAt(0).toUpperCase();
     }
     // Show onboarding for new users
-    if (typeof showOnboarding === 'function') {
-      showOnboarding(user.displayName || user.email);
+    if (typeof window.showOnboarding === 'function') {
+      window.showOnboarding(user.displayName || user.email);
     }
   }
 
