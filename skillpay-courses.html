@@ -190,6 +190,32 @@ textarea.reflect-input:focus{border-color:var(--gold)}
   .sidebar{height:auto;position:relative}
 }
 @media(max-width:600px){.courses-grid{grid-template-columns:1fr}}
+
+/* CERTIFICATE MODAL */
+.cert-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.cert-overlay.hidden{display:none}
+.cert-modal{background:var(--white);border-radius:18px;max-width:600px;width:92%;overflow:hidden;animation:certIn 0.4s ease}
+@keyframes certIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.cert-congrats{text-align:center;padding:40px 32px 24px}
+.cert-trophy{font-size:56px;margin-bottom:16px;display:block}
+.cert-congrats h2{font-size:26px;color:var(--navy);margin-bottom:8px}
+.cert-congrats p{font-size:14px;color:var(--muted);font-weight:300;line-height:1.6}
+.cert-preview{margin:0 24px;border:2px solid var(--gold);border-radius:12px;padding:32px 24px;text-align:center;background:linear-gradient(135deg,#FFFCF5,#FFF9ED)}
+.cert-preview-logo{font-family:'Playfair Display',serif;font-size:16px;color:var(--navy);margin-bottom:4px}
+.cert-preview-logo span{color:var(--gold)}
+.cert-preview-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:16px}
+.cert-preview-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--navy);margin-bottom:4px}
+.cert-preview-course{font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);font-weight:700;margin-bottom:16px}
+.cert-preview-name{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:600;margin-bottom:4px}
+.cert-preview-date{font-size:11px;color:var(--muted)}
+.cert-actions{padding:24px 32px 32px;display:flex;gap:12px}
+.cert-btn{flex:1;padding:13px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s}
+.cert-btn.primary{background:var(--navy);color:var(--white)}
+.cert-btn.primary:hover{background:var(--gold)}
+.cert-btn.ghost{background:transparent;border:1.5px solid var(--border);color:var(--navy)}
+.cert-btn.ghost:hover{border-color:var(--navy)}
+.cert-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(29,158,117,0.1);color:var(--green);font-size:11px;font-weight:600;border-radius:20px;cursor:pointer;margin-top:8px}
+.cert-badge:hover{background:rgba(29,158,117,0.18)}
 </style>
 </head>
 <body>
@@ -323,6 +349,31 @@ textarea.reflect-input:focus{border-color:var(--gold)}
   </div>
 </div>
 
+<!-- CERTIFICATE MODAL -->
+<div class="cert-overlay hidden" id="cert-overlay">
+  <div class="cert-modal">
+    <div class="cert-congrats">
+      <span class="cert-trophy">&#127942;</span>
+      <h2 id="cert-heading">Course complete!</h2>
+      <p id="cert-subtext">You've earned a certificate. Download it and share it!</p>
+    </div>
+    <div class="cert-preview" id="cert-preview">
+      <div class="cert-preview-logo">Skill<span>Pay</span></div>
+      <div class="cert-preview-label">Certificate of completion</div>
+      <div class="cert-preview-title">This certifies that</div>
+      <div class="cert-preview-name" id="cert-name">Student Name</div>
+      <div class="cert-preview-title">has successfully completed</div>
+      <div class="cert-preview-course" id="cert-course">Course Name</div>
+      <div class="cert-preview-date" id="cert-date">Completed on —</div>
+    </div>
+    <div class="cert-actions">
+      <button class="cert-btn ghost" onclick="closeCert()">Back to courses</button>
+      <button class="cert-btn primary" onclick="downloadCert()">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const API_KEY = "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";
 
@@ -651,10 +702,13 @@ function renderCourses() {
   for (const [id, c] of Object.entries(COURSES)) {
     const pct = getCourseProgress(id);
     const done = c.lessons.filter(l => l.status === 'done').length;
+    const isComplete = done === c.lessons.length;
+    const certs = JSON.parse(localStorage.getItem('skillpay_certs') || '[]');
+    const hasCert = certs.find(x => x.courseId === id);
     grid.innerHTML += `<div class="course-card" data-cat="${c.cat}" onclick="openCourse('${id}')">
       <div class="course-thumb" style="background:linear-gradient(135deg,${c.color},${c.color}88)">
         <div class="course-thumb-icon">${c.icon}</div>
-        <div class="course-thumb-label">${c.tag}</div>
+        <div class="course-thumb-label">${isComplete ? '✓ Completed' : c.tag}</div>
         <div class="course-thumb-lessons">${c.lessons.length} lessons</div>
       </div>
       <div class="course-body">
@@ -663,6 +717,7 @@ function renderCourses() {
         <div class="course-desc">${c.desc}</div>
         <div class="course-footer"><div class="course-meta"><span>${done}/${c.lessons.length} done</span><span>Beginner</span></div><div class="course-rating">${pct > 0 ? pct + '% complete' : '★ 4.8'}</div></div>
         <div class="prog-mini"><div class="prog-mini-fill" style="width:${pct}%"></div></div>
+        ${hasCert ? `<div class="cert-badge" onclick="event.stopPropagation();viewCertificate('${id}')">&#127942; View certificate</div>` : ''}
       </div></div>`;
   }
 }
@@ -822,9 +877,154 @@ function completeLesson() {
   if (currentLessonIndex < c.lessons.length - 1) {
     openLesson(currentCourse, currentLessonIndex + 1);
   } else {
-    alert('Course complete! Well done.');
-    renderCourses();
-    showScreen('courses');
+    showCertificate(currentCourse);
+  }
+}
+
+function getStudentName() {
+  try {
+    const name = localStorage.getItem('skillpay_student_name');
+    if (name) return name;
+  } catch(e) {}
+  const n = prompt('Enter your full name for the certificate:') || 'Student';
+  localStorage.setItem('skillpay_student_name', n);
+  return n;
+}
+
+function showCertificate(courseId) {
+  const c = COURSES[courseId];
+  const name = getStudentName();
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('cert-name').textContent = name;
+  document.getElementById('cert-course').textContent = c.title;
+  document.getElementById('cert-date').textContent = 'Completed on ' + date;
+  document.getElementById('cert-overlay').classList.remove('hidden');
+
+  // Save certificate
+  const certs = JSON.parse(localStorage.getItem('skillpay_certs') || '[]');
+  if (!certs.find(x => x.courseId === courseId)) {
+    certs.push({ courseId, title: c.title, name, date, color: c.color });
+    localStorage.setItem('skillpay_certs', JSON.stringify(certs));
+  }
+}
+
+function closeCert() {
+  document.getElementById('cert-overlay').classList.add('hidden');
+  renderCourses();
+  showScreen('courses');
+}
+
+function downloadCert() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const w = 297, h = 210;
+  const name = document.getElementById('cert-name').textContent;
+  const course = document.getElementById('cert-course').textContent;
+  const date = document.getElementById('cert-date').textContent;
+
+  // Background
+  doc.setFillColor(253, 250, 243);
+  doc.rect(0, 0, w, h, 'F');
+
+  // Gold border
+  doc.setDrawColor(201, 147, 58);
+  doc.setLineWidth(1.5);
+  doc.rect(12, 12, w - 24, h - 24);
+  doc.setLineWidth(0.5);
+  doc.rect(15, 15, w - 30, h - 30);
+
+  // Corner accents
+  doc.setFillColor(201, 147, 58);
+  [{ x: 12, y: 12 }, { x: w - 20, y: 12 }, { x: 12, y: h - 20 }, { x: w - 20, y: h - 20 }].forEach(p => {
+    doc.rect(p.x, p.y, 8, 8, 'F');
+  });
+
+  // Logo
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(13, 27, 42);
+  doc.text('Skill', w / 2 - 10, 36, { align: 'center' });
+  doc.setTextColor(201, 147, 58);
+  doc.text('Pay', w / 2 + 10, 36, { align: 'center' });
+
+  // Certificate label
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(201, 147, 58);
+  doc.text('CERTIFICATE OF COMPLETION', w / 2, 48, { align: 'center' });
+
+  // Decorative line
+  doc.setDrawColor(201, 147, 58);
+  doc.setLineWidth(0.5);
+  doc.line(w / 2 - 40, 53, w / 2 + 40, 53);
+
+  // "This certifies that"
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(122, 138, 154);
+  doc.text('This certifies that', w / 2, 68, { align: 'center' });
+
+  // Student name
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(28);
+  doc.setTextColor(13, 27, 42);
+  doc.text(name, w / 2, 82, { align: 'center' });
+
+  // Line under name
+  doc.setDrawColor(201, 147, 58);
+  doc.setLineWidth(0.3);
+  doc.line(w / 2 - 50, 87, w / 2 + 50, 87);
+
+  // "has successfully completed"
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(122, 138, 154);
+  doc.text('has successfully completed the course', w / 2, 100, { align: 'center' });
+
+  // Course name
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(201, 147, 58);
+  doc.text(course, w / 2, 114, { align: 'center' });
+
+  // Description
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(122, 138, 154);
+  doc.text('Demonstrating proficiency in practical skills for earning income online', w / 2, 126, { align: 'center' });
+  doc.text('through structured lessons, real-world tasks, quizzes, and reflections.', w / 2, 132, { align: 'center' });
+
+  // Date
+  doc.setFontSize(11);
+  doc.setTextColor(122, 138, 154);
+  doc.text(date, w / 2, 150, { align: 'center' });
+
+  // Signature line
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.3);
+  doc.line(w / 2 - 35, 170, w / 2 + 35, 170);
+  doc.setFontSize(9);
+  doc.setTextColor(170, 170, 170);
+  doc.text('SkillPay Learning Platform', w / 2, 176, { align: 'center' });
+
+  // Credential ID
+  doc.setFontSize(7);
+  doc.setTextColor(200, 200, 200);
+  doc.text('Credential ID: SP-' + Date.now().toString(36).toUpperCase(), w / 2, h - 18, { align: 'center' });
+
+  doc.save('SkillPay-Certificate-' + course.replace(/[^a-zA-Z0-9]/g, '-') + '.pdf');
+}
+
+function viewCertificate(courseId) {
+  const certs = JSON.parse(localStorage.getItem('skillpay_certs') || '[]');
+  const cert = certs.find(x => x.courseId === courseId);
+  if (cert) {
+    document.getElementById('cert-name').textContent = cert.name;
+    document.getElementById('cert-course').textContent = cert.title;
+    document.getElementById('cert-date').textContent = 'Completed on ' + cert.date;
+    document.getElementById('cert-heading').textContent = 'Your certificate';
+    document.getElementById('cert-subtext').textContent = 'Download or share your certificate of completion.';
+    document.getElementById('cert-overlay').classList.remove('hidden');
   }
 }
 
