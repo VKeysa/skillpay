@@ -466,6 +466,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     document.getElementById('onboarding').classList.remove('hidden');
     renderOnboardStep();
   }
+  window.showOnboarding = showOnboarding;
 
   function renderOnboardStep() {
     const step = onboardSteps[onboardStep];
