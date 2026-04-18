@@ -695,6 +695,31 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         <div class="badges-grid" id="badges-grid"></div>
       </div>
 
+      <!-- DAILY CHALLENGE -->
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border)">
+        <div class="section-heading" style="margin-bottom:4px">Daily challenge</div>
+        <p style="font-size:13px;color:var(--muted);font-weight:300;margin-bottom:16px">Complete today's challenge to earn bonus XP and build your streak</p>
+        <div id="daily-challenge-card" style="background:var(--navy);border-radius:14px;padding:24px 28px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(201,147,58,0.06)"></div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;position:relative">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(201,147,58,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0" id="dc-icon">&#9889;</div>
+            <div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px" id="dc-label">Today's challenge</div>
+              <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--white)" id="dc-title">Loading...</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;flex-shrink:0">
+              <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);font-weight:700">+35 XP</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3)">Bonus reward</div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.55);font-weight:300;line-height:1.7;margin-bottom:18px;position:relative" id="dc-desc">Loading challenge...</p>
+          <div style="display:flex;gap:10px;position:relative">
+            <button id="dc-complete-btn" onclick="completeDailyChallenge()" style="padding:10px 22px;background:var(--gold);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s">Mark as complete</button>
+            <button onclick="skipDailyChallenge()" style="padding:10px 18px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.15s" id="dc-skip-btn">Skip</button>
+          </div>
+        </div>
+      </div>
+
       <!-- INCOME TRACKER -->
       <div style="margin-top:32px;padding-top:28px;border-top:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -1008,6 +1033,73 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   window.renderGamification = renderGamification;
   window.updateStreak = updateStreak;
 
+  // ── DAILY CHALLENGES ──
+  const DAILY_CHALLENGES = [
+    { icon: '&#128269;', title: 'Scout 3 freelance gigs', desc: 'Go to Fiverr or Upwork and find 3 gigs in your niche that you could realistically apply to. Save the links.' },
+    { icon: '&#9998;', title: 'Write your elevator pitch', desc: 'Write a 2-sentence description of what you do and who you help. Post it in the notes below your task.' },
+    { icon: '&#128241;', title: 'Post one piece of content', desc: 'Create and post one short-form video, tweet, or LinkedIn post about something you learned on SkillPay.' },
+    { icon: '&#128176;', title: 'Find a product to review', desc: 'Find one product in your niche you could write an honest review about. Bonus: sign up for their affiliate program.' },
+    { icon: '&#128172;', title: 'DM 3 potential clients', desc: 'Send a personalized message to 3 small businesses that could use your help. Use the pitch formula from the course.' },
+    { icon: '&#128218;', title: 'Teach what you learned', desc: 'Explain one thing you learned on SkillPay to someone — a friend, a post, or even a voice memo to yourself.' },
+    { icon: '&#128200;', title: 'Track your numbers', desc: 'Log your progress: how many pitches sent, responses received, and money earned this week. Reflection = growth.' },
+    { icon: '&#9733;', title: 'Improve your profile', desc: 'Update one thing on your freelance profile, portfolio, or social media bio to make it clearer and more compelling.' },
+    { icon: '&#128161;', title: 'Brainstorm 5 product ideas', desc: 'Write down 5 digital products you could create based on what you know. Pick the one that excites you most.' },
+    { icon: '&#128640;', title: 'Set your weekly goal', desc: 'Write down exactly how much money you want to earn this week and the 3 specific actions you will take to get there.' },
+    { icon: '&#129504;', title: 'Study a competitor', desc: 'Find someone successful in your niche. Study their profile, content, or product. Write down 3 things you can learn from them.' },
+    { icon: '&#128170;', title: 'Do the hardest thing first', desc: 'What have you been avoiding? The scary pitch, the first post, the price increase? Do that ONE thing today.' },
+    { icon: '&#127775;', title: 'Collect a testimonial', desc: 'If you have done any work for anyone, ask them for a short testimonial. Even a text message works as social proof.' },
+    { icon: '&#128736;', title: 'Automate one task', desc: 'Set up one template, shortcut, or system that saves you time on a task you do repeatedly.' }
+  ];
+
+  function getDailyChallenge() {
+    var today = new Date().toISOString().split('T')[0];
+    var saved = localStorage.getItem('skillpay_daily_challenge');
+    if (saved) {
+      var data = JSON.parse(saved);
+      if (data.date === today) return data;
+    }
+    var dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    var index = dayOfYear % DAILY_CHALLENGES.length;
+    var challenge = { ...DAILY_CHALLENGES[index], date: today, completed: false, skipped: false };
+    localStorage.setItem('skillpay_daily_challenge', JSON.stringify(challenge));
+    return challenge;
+  }
+
+  function renderDailyChallenge() {
+    var c = getDailyChallenge();
+    document.getElementById('dc-icon').innerHTML = c.icon;
+    document.getElementById('dc-title').textContent = c.title;
+    document.getElementById('dc-desc').textContent = c.desc;
+    var btn = document.getElementById('dc-complete-btn');
+    var skipBtn = document.getElementById('dc-skip-btn');
+    if (c.completed) {
+      btn.textContent = 'Completed!';
+      btn.style.background = '#1D9E75';
+      btn.disabled = true;
+      skipBtn.style.display = 'none';
+      document.getElementById('dc-label').textContent = 'Challenge complete!';
+    } else if (c.skipped) {
+      btn.style.display = 'none';
+      skipBtn.textContent = 'Skipped — come back tomorrow';
+      skipBtn.disabled = true;
+    }
+  }
+
+  window.completeDailyChallenge = function() {
+    var c = getDailyChallenge();
+    c.completed = true;
+    localStorage.setItem('skillpay_daily_challenge', JSON.stringify(c));
+    addXP(35, 'Daily challenge completed!');
+    renderDailyChallenge();
+  };
+
+  window.skipDailyChallenge = function() {
+    var c = getDailyChallenge();
+    c.skipped = true;
+    localStorage.setItem('skillpay_daily_challenge', JSON.stringify(c));
+    renderDailyChallenge();
+  };
+
   // ── INCOME TRACKER ──
   function getEarnings() {
     try { return JSON.parse(localStorage.getItem('skillpay_earnings') || '[]'); } catch(e) { return []; }
@@ -1128,6 +1220,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     updateStreak();
     renderGamification();
     checkBadges();
+    renderDailyChallenge();
   });
 </script>
 
