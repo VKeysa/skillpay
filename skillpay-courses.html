@@ -192,6 +192,31 @@ textarea.reflect-input:focus{border-color:var(--gold)}
 @media(max-width:600px){.courses-grid{grid-template-columns:1fr}}
 @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 
+/* PRO BADGE & PAYWALL */
+.pro-badge{position:absolute;top:12px;left:12px;background:linear-gradient(135deg,#C9933A,#E8B86D);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.8px;z-index:2}
+.course-card.pro-locked .course-thumb::after{content:'';position:absolute;inset:0;background:rgba(13,27,42,0.3)}
+.paywall-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.paywall-overlay.hidden{display:none}
+.paywall-card{background:var(--white);border-radius:18px;max-width:440px;width:90%;overflow:hidden;animation:certIn 0.3s ease;text-align:center;padding:40px 32px}
+.paywall-icon{font-size:48px;margin-bottom:14px;display:block}
+.paywall-card h3{font-size:24px;color:var(--navy);margin-bottom:8px}
+.paywall-card p{font-size:14px;color:var(--muted);font-weight:300;line-height:1.7;margin-bottom:24px}
+.paywall-features{text-align:left;margin-bottom:24px}
+.paywall-feat{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:var(--body)}
+.paywall-feat-icon{width:20px;height:20px;border-radius:50%;background:rgba(201,147,58,0.12);color:var(--gold);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.paywall-btn{width:100%;padding:14px;background:var(--gold);color:var(--white);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-bottom:10px}
+.paywall-btn:hover{background:var(--gold-light)}
+.paywall-close{font-size:13px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.paywall-close:hover{color:var(--navy)}
+.paywall-price{font-family:'Playfair Display',serif;font-size:32px;color:var(--navy);font-weight:700;margin-bottom:4px}
+.paywall-price span{font-size:14px;color:var(--muted);font-weight:400}
+[data-theme="dark"] .paywall-card{background:#161B22}
+[data-theme="dark"] .paywall-card h3{color:#F0F6FC!important}
+[data-theme="dark"] .paywall-card p{color:#8B949E!important}
+[data-theme="dark"] .paywall-feat{color:#C9D1D9}
+[data-theme="dark"] .paywall-price{color:#F0F6FC}
+[data-theme="dark"] .paywall-close{color:#8B949E}
+
 /* CERTIFICATE MODAL */
 .cert-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .cert-overlay.hidden{display:none}
@@ -517,6 +542,8 @@ textarea.reflect-input:focus{border-color:var(--gold)}
         <button class="filter-btn" onclick="filterCourses('digital',this)">Digital products</button>
         <button class="filter-btn" onclick="filterCourses('crypto',this)">Crypto & investing</button>
         <button class="filter-btn" onclick="filterCourses('coding',this)">Coding & tech</button>
+        <button class="filter-btn" onclick="filterCourses('trading',this)">Trading</button>
+        <button class="filter-btn" onclick="filterCourses('advanced',this)">Advanced</button>
       </div>
       <div class="courses-grid" id="courses-grid"></div>
     </div>
@@ -609,6 +636,25 @@ textarea.reflect-input:focus{border-color:var(--gold)}
         <button class="lesson-nav-btn primary" id="next-btn" onclick="navigateLesson(1)">Next lesson<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 11l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- PAYWALL MODAL -->
+<div class="paywall-overlay hidden" id="paywall-overlay">
+  <div class="paywall-card">
+    <span class="paywall-icon">&#128274;</span>
+    <h3>This is a Pro course</h3>
+    <p>Upgrade to the Pro plan to unlock all advanced courses including trading, AI automation, and more.</p>
+    <div class="paywall-price">$10.99<span>/mo</span></div>
+    <div class="paywall-features">
+      <div class="paywall-feat"><div class="paywall-feat-icon">&#10003;</div>All 17+ courses unlocked</div>
+      <div class="paywall-feat"><div class="paywall-feat-icon">&#10003;</div>Advanced trading & investing courses</div>
+      <div class="paywall-feat"><div class="paywall-feat-icon">&#10003;</div>AI tutor available 24/7</div>
+      <div class="paywall-feat"><div class="paywall-feat-icon">&#10003;</div>Personalized learning path</div>
+      <div class="paywall-feat"><div class="paywall-feat-icon">&#10003;</div>Priority support</div>
+    </div>
+    <button class="paywall-btn" onclick="window.open('https://buy.stripe.com/test_aFaaEPdDEgF0g0C4ZMew801','_blank')">Upgrade to Pro — $10.99/mo</button>
+    <button class="paywall-close" onclick="document.getElementById('paywall-overlay').classList.add('hidden')">Maybe later</button>
   </div>
 </div>
 
@@ -943,6 +989,194 @@ const COURSES = {
       { q: "What's a 'retainer' in freelancing?", opts: ["A dental device", "A monthly recurring payment for ongoing services", "A one-time project fee", "A tip"], a: 1 },
       { q: "Why is reporting important for SMM clients?", opts: ["It isn't important", "It shows the value of your work and justifies your fee", "Clients never look at reports", "It's legally required"], a: 1 }
     ]}
+  },
+  daytrading: {
+    title: "Day Trading & the Stock Market", desc: "Learn to read charts, find entries, and make profitable day trades.", icon: "&#9650;", color: "#185FA5", cat: "trading advanced", tag: "PRO", subject: "Day trading", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "What is day trading and is it for you?", desc: "Honest reality check before you start", time: "25min", status: "active" },
+      { title: "Understanding candlestick charts", desc: "Read price action like a pro", time: "30min", status: "locked" },
+      { title: "Key indicators: RSI, MACD, and volume", desc: "The tools that matter", time: "30min", status: "locked" },
+      { title: "Finding entries and exits", desc: "When to buy and when to sell", time: "35min", status: "locked" },
+      { title: "Risk management and position sizing", desc: "Protect your capital at all costs", time: "30min", status: "locked" },
+      { title: "Building your trading plan", desc: "Rules-based trading beats emotion", time: "25min", status: "locked" },
+      { title: "Paper trading: practice without risk", desc: "Simulate before you risk real money", time: "25min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What is day trading?", opts: ["Buying and holding for years", "Buying and selling within the same trading day", "Only trading at night", "Investing in real estate"], a: 1 },
+      { q: "What does a green candlestick mean?", opts: ["Price went down", "Price went up during that period", "The market is closed", "High volume"], a: 1 },
+      { q: "What does RSI measure?", opts: ["Company revenue", "Whether a stock is overbought or oversold", "Number of traders", "Dividend yield"], a: 1 },
+      { q: "What is a 'stop loss'?", opts: ["Giving up on trading", "An automatic order that limits your losses", "A type of stock", "A trading strategy"], a: 1 },
+      { q: "How much of your capital should you risk per trade?", opts: ["50%", "All of it", "1-2% maximum", "It doesn't matter"], a: 2 },
+      { q: "What is 'paper trading'?", opts: ["Trading on paper certificates", "Simulated trading with fake money", "Trading penny stocks", "Writing down stock names"], a: 1 },
+      { q: "What is the biggest risk in day trading?", opts: ["Boredom", "Losing more than you can afford", "Making too much money", "Having to wake up early"], a: 1 },
+      { q: "What does MACD stand for?", opts: ["Moving Average Convergence Divergence", "Market Analysis Currency Data", "Monthly Average Cost Difference", "Maximum Allowed Capital Deployment"], a: 0 },
+      { q: "Why is volume important?", opts: ["It measures how loud the market is", "It confirms the strength of price movements", "It shows how many companies exist", "It doesn't matter"], a: 1 },
+      { q: "What is the 'PDT rule'?", opts: ["A type of stock order", "Pattern Day Trader rule requiring $25K minimum", "A trading indicator", "A tax regulation"], a: 1 },
+      { q: "What should you never do when day trading?", opts: ["Use stop losses", "Trade with money you need for bills", "Study charts", "Keep a trading journal"], a: 1 },
+      { q: "What is 'support' in technical analysis?", opts: ["Customer support", "A price level where buying pressure prevents further decline", "The highest price ever", "A type of stock"], a: 1 }
+    ]}
+  },
+  forex: {
+    title: "Forex Trading for Beginners", desc: "Master currency trading and the world's largest financial market.", icon: "&#128177;", color: "#0F6E56", cat: "trading advanced", tag: "PRO", subject: "Forex trading", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "What is forex and how does it work?", desc: "The basics of currency pairs", time: "25min", status: "active" },
+      { title: "Major, minor, and exotic pairs", desc: "Which currencies to trade", time: "20min", status: "locked" },
+      { title: "Reading forex charts and timeframes", desc: "From 1-minute to daily charts", time: "30min", status: "locked" },
+      { title: "Leverage and margin explained", desc: "Power and danger of leverage", time: "25min", status: "locked" },
+      { title: "Building a forex trading strategy", desc: "Your edge in the market", time: "30min", status: "locked" },
+      { title: "Managing risk in forex", desc: "Pips, lots, and position sizing", time: "30min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What does 'forex' stand for?", opts: ["Foreign exchange", "Forward execution", "Formula exchange", "Forced exit"], a: 0 },
+      { q: "What is a 'currency pair'?", opts: ["Two currencies traded against each other", "A pair of traders", "Two stock exchanges", "A type of bond"], a: 0 },
+      { q: "What is EUR/USD?", opts: ["Euro vs US Dollar", "European Stock vs US Stock", "A crypto token", "A bank name"], a: 0 },
+      { q: "What is leverage in forex?", opts: ["A type of currency", "Borrowing money to increase position size", "A chart pattern", "A trading platform"], a: 1 },
+      { q: "What is a 'pip' in forex?", opts: ["A fruit seed", "The smallest price movement in a currency pair", "A type of order", "A trading fee"], a: 1 },
+      { q: "When is the forex market open?", opts: ["Only weekdays 9-5", "24 hours a day, 5 days a week", "Only weekends", "24/7 including holidays"], a: 1 },
+      { q: "What is the most traded currency pair?", opts: ["GBP/JPY", "EUR/USD", "AUD/NZD", "USD/TRY"], a: 1 },
+      { q: "Why is leverage dangerous?", opts: ["It's not dangerous", "It can amplify losses just as much as gains", "It costs too much", "It's illegal"], a: 1 },
+      { q: "What is a 'lot' in forex?", opts: ["A parking space", "A standardized unit of currency (100,000 units)", "A type of analysis", "A fee structure"], a: 1 },
+      { q: "What should beginners start with?", opts: ["Maximum leverage", "A demo account with virtual money", "Real money immediately", "The most exotic pairs"], a: 1 }
+    ]}
+  },
+  options: {
+    title: "Options Trading Fundamentals", desc: "Understand calls, puts, and strategies to profit in any market.", icon: "&#9878;", color: "#534AB7", cat: "trading advanced", tag: "PRO", subject: "Options trading", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "What are options and why trade them?", desc: "Calls and puts explained simply", time: "30min", status: "active" },
+      { title: "Buying calls and puts", desc: "Your first options trades", time: "25min", status: "locked" },
+      { title: "The Greeks: Delta, Theta, and Gamma", desc: "How options prices move", time: "35min", status: "locked" },
+      { title: "Covered calls and cash-secured puts", desc: "Conservative income strategies", time: "30min", status: "locked" },
+      { title: "Spreads and advanced strategies", desc: "Limit risk, increase probability", time: "35min", status: "locked" },
+      { title: "Managing options positions", desc: "Rolling, adjusting, and closing", time: "30min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What is a 'call option'?", opts: ["A phone call to your broker", "The right to buy a stock at a set price", "A type of stock", "A trading fee"], a: 1 },
+      { q: "What is a 'put option'?", opts: ["Putting money in a savings account", "The right to sell a stock at a set price", "A type of dividend", "A market order"], a: 1 },
+      { q: "What is the 'strike price'?", opts: ["The price when you're angry", "The predetermined price at which an option can be exercised", "The highest price ever", "The broker's fee"], a: 1 },
+      { q: "What does 'expiration date' mean for options?", opts: ["When the food expires", "The last day the option contract is valid", "When the stock delists", "When dividends are paid"], a: 1 },
+      { q: "What is 'premium' in options?", opts: ["A subscription plan", "The price you pay to buy the option contract", "A type of stock", "The broker's commission"], a: 1 },
+      { q: "What does 'in the money' mean?", opts: ["You're wealthy", "The option would be profitable if exercised now", "The market is open", "You have cash in your account"], a: 1 },
+      { q: "What is Theta in options?", opts: ["A Greek letter only", "Time decay — options lose value as expiration approaches", "A stock ticker", "A trading strategy"], a: 1 },
+      { q: "What is a covered call?", opts: ["A phone call with a blanket", "Selling a call option while owning the underlying stock", "Buying insurance", "A secret trade"], a: 1 },
+      { q: "What is the maximum loss when buying a call?", opts: ["Unlimited", "The premium you paid", "Your entire account", "50% of the stock price"], a: 1 },
+      { q: "Why are options considered risky?", opts: ["They're not risky", "They can expire worthless and you lose your entire investment", "They're too easy", "The government says so"], a: 1 }
+    ]}
+  },
+  advancedcrypto: {
+    title: "Advanced Crypto: DeFi & Yield Farming", desc: "Go beyond Bitcoin — learn DeFi protocols, staking, and passive crypto income.", icon: "&#9883;", color: "#854F0B", cat: "crypto advanced", tag: "PRO", subject: "Advanced crypto", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "DeFi explained: the new financial system", desc: "What decentralized finance actually is", time: "30min", status: "active" },
+      { title: "Staking: earn passive income on crypto", desc: "Lock your coins, earn rewards", time: "25min", status: "locked" },
+      { title: "Liquidity pools and yield farming", desc: "Provide liquidity, earn fees", time: "35min", status: "locked" },
+      { title: "Smart contracts and protocols", desc: "Uniswap, Aave, Compound explained", time: "30min", status: "locked" },
+      { title: "NFTs and digital ownership", desc: "Beyond the hype — real use cases", time: "25min", status: "locked" },
+      { title: "Security: protecting your crypto assets", desc: "Avoiding scams, hacks, and rug pulls", time: "30min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What does DeFi stand for?", opts: ["Definitely Finance", "Decentralized Finance", "Digital Fiat", "Derivative Financing"], a: 1 },
+      { q: "What is staking?", opts: ["Putting stakes in the ground", "Locking crypto to earn rewards and secure the network", "Selling all your crypto", "Day trading"], a: 1 },
+      { q: "What is a liquidity pool?", opts: ["A swimming pool", "A collection of crypto locked in a smart contract for trading", "A bank account", "A type of wallet"], a: 1 },
+      { q: "What is yield farming?", opts: ["Growing crops", "Maximizing returns by moving crypto between DeFi protocols", "Mining Bitcoin", "Saving money in a bank"], a: 1 },
+      { q: "What is a 'rug pull'?", opts: ["Interior decorating", "A scam where developers abandon a project and steal funds", "A trading strategy", "A type of token"], a: 1 },
+      { q: "What is a smart contract?", opts: ["A very clever legal document", "Self-executing code on a blockchain that runs automatically", "An email agreement", "A phone app"], a: 1 },
+      { q: "What is TVL in DeFi?", opts: ["Television", "Total Value Locked — the amount of crypto in a protocol", "Trading Volume Limit", "Token Verification Level"], a: 1 },
+      { q: "Why is DeFi risky?", opts: ["It's not risky", "Smart contract bugs, hacks, and impermanent loss", "It's too popular", "The government controls it"], a: 1 },
+      { q: "What is impermanent loss?", opts: ["Temporary memory loss", "Loss from providing liquidity when token prices change", "Losing your password", "A tax penalty"], a: 1 },
+      { q: "What is the safest DeFi practice?", opts: ["Put everything in one protocol", "Only use audited protocols and start with small amounts", "Never read the docs", "Trust every new token"], a: 1 },
+      { q: "What is an NFT?", opts: ["A new type of bank", "A Non-Fungible Token — unique digital asset on blockchain", "A trading strategy", "A type of cryptocurrency"], a: 1 }
+    ]}
+  },
+  realestate: {
+    title: "Real Estate Investing 101", desc: "Learn to invest in property without needing millions upfront.", icon: "&#127968;", color: "#712B13", cat: "advanced", tag: "PRO", subject: "Real estate", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "How real estate investing works", desc: "Rental income, appreciation, and leverage", time: "25min", status: "active" },
+      { title: "REITs: invest without buying property", desc: "Real estate in your brokerage account", time: "20min", status: "locked" },
+      { title: "Analyzing your first rental property", desc: "Cash flow, cap rate, and ROI", time: "30min", status: "locked" },
+      { title: "House hacking: live for free", desc: "Buy a duplex, rent the other side", time: "25min", status: "locked" },
+      { title: "Financing and getting approved", desc: "Mortgages, FHA loans, and creative financing", time: "30min", status: "locked" },
+      { title: "Managing tenants and scaling", desc: "From 1 property to a portfolio", time: "25min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What is a REIT?", opts: ["A type of house", "Real Estate Investment Trust — invest in property via stocks", "A rental agreement", "A mortgage type"], a: 1 },
+      { q: "What is 'cash flow' in real estate?", opts: ["How fast cash moves", "Rental income minus all expenses", "The price of the property", "A type of loan"], a: 1 },
+      { q: "What is 'house hacking'?", opts: ["Breaking into houses", "Living in one unit and renting out others to cover your mortgage", "Flipping houses", "Hacking real estate websites"], a: 1 },
+      { q: "What is cap rate?", opts: ["A hat rating", "Net operating income divided by property value", "A type of mortgage", "The interest rate"], a: 1 },
+      { q: "What is leverage in real estate?", opts: ["A type of tool", "Using borrowed money to buy property with a small down payment", "The height of a building", "A tax benefit"], a: 1 },
+      { q: "What is an FHA loan?", opts: ["A type of crypto", "Government-backed mortgage with low down payment (3.5%)", "A personal loan", "A business grant"], a: 1 },
+      { q: "What is appreciation?", opts: ["Saying thank you", "Increase in property value over time", "A type of tax", "Monthly rent"], a: 1 },
+      { q: "What is the 1% rule?", opts: ["Only invest 1% of your money", "Monthly rent should be at least 1% of purchase price", "Always negotiate 1% off", "Only buy one property"], a: 1 },
+      { q: "Why is location important?", opts: ["It's not important", "It determines demand, rent prices, and appreciation potential", "Only for vacation homes", "Because of weather"], a: 1 },
+      { q: "What is the biggest mistake new investors make?", opts: ["Saving too much", "Not running the numbers and buying based on emotion", "Starting too early", "Asking too many questions"], a: 1 }
+    ]}
+  },
+  aiautomation: {
+    title: "AI & Automation for Income", desc: "Use AI tools to build, automate, and scale your online business.", icon: "&#129302;", color: "#3C3489", cat: "coding advanced", tag: "PRO", subject: "AI & automation", difficulty: "medium", tier: "pro",
+    lessons: [
+      { title: "How AI is changing online income", desc: "The tools you need to know", time: "20min", status: "active" },
+      { title: "Using ChatGPT to 10x your output", desc: "Write, research, and create faster", time: "25min", status: "locked" },
+      { title: "AI for content creation", desc: "Generate posts, videos, and graphics", time: "25min", status: "locked" },
+      { title: "Automating your business with Zapier", desc: "Connect tools and save hours", time: "30min", status: "locked" },
+      { title: "Building AI-powered products to sell", desc: "Create tools people will pay for", time: "35min", status: "locked" },
+      { title: "AI freelancing: sell AI skills", desc: "Offer AI services to businesses", time: "25min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "Which AI tool is most commonly used for text generation?", opts: ["Photoshop", "ChatGPT", "Excel", "Zoom"], a: 1 },
+      { q: "What is 'prompt engineering'?", opts: ["Building engines", "Crafting effective instructions to get better AI outputs", "A type of coding", "Engineering school"], a: 1 },
+      { q: "What does Zapier do?", opts: ["Makes pizza", "Automates workflows by connecting different apps", "A social media platform", "An AI chatbot"], a: 1 },
+      { q: "How can AI help freelancers?", opts: ["It can't", "Speed up delivery, improve quality, handle more clients", "Replace all human work", "Only coders can use AI"], a: 1 },
+      { q: "What is a 'no-code' AI tool?", opts: ["A tool with no access code", "AI tools you can use without programming knowledge", "A broken tool", "A free tool"], a: 1 },
+      { q: "What AI service can freelancers sell?", opts: ["Nothing", "AI content writing, chatbot setup, automation consulting", "Only coding", "Hardware repair"], a: 1 },
+      { q: "What is the biggest advantage of AI automation?", opts: ["It's fun", "It handles repetitive tasks so you focus on high-value work", "It's free forever", "It replaces all employees"], a: 1 },
+      { q: "Which is NOT a good use of AI for business?", opts: ["Drafting emails faster", "Generating social media content", "Making all decisions without human review", "Analyzing customer data"], a: 2 },
+      { q: "What AI tool can generate images?", opts: ["Microsoft Word", "Midjourney or DALL-E", "Spotify", "Google Maps"], a: 1 },
+      { q: "How can you monetize AI skills?", opts: ["You can't", "Offer AI consulting, build AI tools, create AI content", "Only big companies can", "Wait 10 years"], a: 1 }
+    ]}
+  },
+  advanceddropship: {
+    title: "Scale Dropshipping to $10K/Month", desc: "Advanced strategies to scale your store past the first sale.", icon: "&#128640;", color: "#A32D2D", cat: "digital advanced", tag: "PRO", subject: "Advanced dropshipping", difficulty: "hard", tier: "pro",
+    lessons: [
+      { title: "From first sale to consistent revenue", desc: "Scaling mindset and metrics", time: "25min", status: "active" },
+      { title: "Advanced Facebook & TikTok ads", desc: "Lookalike audiences and retargeting", time: "35min", status: "locked" },
+      { title: "Building a brand, not just a store", desc: "Custom packaging and brand identity", time: "30min", status: "locked" },
+      { title: "Sourcing agents and faster shipping", desc: "Move beyond AliExpress", time: "25min", status: "locked" },
+      { title: "Upsells, bundles, and AOV optimization", desc: "Make more from each customer", time: "30min", status: "locked" },
+      { title: "Hiring and outsourcing to scale", desc: "Build a team without an office", time: "25min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What is a 'lookalike audience'?", opts: ["People who look alike", "An ad audience based on your existing customers' characteristics", "A fake audience", "A type of influencer"], a: 1 },
+      { q: "What is AOV?", opts: ["Average Order Value", "Always On Video", "Automated Online Vendor", "Ad Optimization Value"], a: 0 },
+      { q: "Why is retargeting important?", opts: ["It's not important", "Most visitors don't buy on the first visit — retargeting brings them back", "It's cheaper than all other ads", "Google requires it"], a: 1 },
+      { q: "What is a sourcing agent?", opts: ["A spy", "A person in China who finds manufacturers and handles shipping for you", "A type of software", "A customs officer"], a: 1 },
+      { q: "What is COGS?", opts: ["A type of gear", "Cost of Goods Sold", "Customer Online Growth Score", "Creative Output Generation System"], a: 1 },
+      { q: "Why should you move beyond AliExpress?", opts: ["It's illegal", "Faster shipping, better quality, custom branding", "It's too cheap", "You shouldn't, it's the best"], a: 1 },
+      { q: "What is an upsell?", opts: ["Selling uphill", "Offering a higher-value product after initial purchase", "A discount", "A return policy"], a: 1 },
+      { q: "When should you start hiring?", opts: ["Immediately", "When repetitive tasks are taking time away from growth", "Never — do everything yourself", "Only after $1M revenue"], a: 1 },
+      { q: "What is the most important metric when scaling?", opts: ["Number of products", "Customer acquisition cost vs lifetime value", "Website visits", "Social media followers"], a: 1 },
+      { q: "What makes a brand different from a store?", opts: ["Nothing", "Brand loyalty, recognition, repeat customers, and higher margins", "Just a logo", "A bigger warehouse"], a: 1 }
+    ]}
+  },
+  emailfunnels: {
+    title: "Email Marketing & Sales Funnels", desc: "Build automated email systems that sell while you sleep.", icon: "&#9993;", color: "#993C1D", cat: "digital advanced", tag: "PRO", subject: "Email marketing", difficulty: "medium", tier: "pro",
+    lessons: [
+      { title: "Why email marketing still works", desc: "The highest ROI marketing channel", time: "20min", status: "active" },
+      { title: "Building your email list from zero", desc: "Lead magnets and opt-in pages", time: "25min", status: "locked" },
+      { title: "Writing emails people actually open", desc: "Subject lines, hooks, and CTAs", time: "25min", status: "locked" },
+      { title: "Setting up your first funnel", desc: "Welcome sequence that converts", time: "30min", status: "locked" },
+      { title: "Automation: sequences that sell on autopilot", desc: "Set it up once, earn forever", time: "30min", status: "locked" },
+      { title: "Scaling with paid traffic + email", desc: "Ads feed the funnel, email closes the sale", time: "25min", status: "locked" }
+    ],
+    quizzes: { 0: [
+      { q: "What is the average ROI of email marketing?", opts: ["$1 for every $1", "$36 for every $1 spent", "$2 for every $1", "Negative ROI"], a: 1 },
+      { q: "What is a 'lead magnet'?", opts: ["A refrigerator magnet", "A free resource offered in exchange for an email address", "A type of ad", "A social media post"], a: 1 },
+      { q: "What is an email 'welcome sequence'?", opts: ["A greeting card", "A series of automated emails sent to new subscribers", "A single welcome email", "A phone call"], a: 1 },
+      { q: "What is a 'sales funnel'?", opts: ["A kitchen tool", "A step-by-step journey that guides people from awareness to purchase", "A type of ad campaign", "A social media strategy"], a: 1 },
+      { q: "What matters most in an email subject line?", opts: ["Length", "Curiosity and relevance — making people want to open it", "Using all caps", "Including your company name"], a: 1 },
+      { q: "What is 'open rate'?", opts: ["How often your store is open", "The percentage of recipients who open your email", "Your working hours", "How fast emails load"], a: 1 },
+      { q: "What is segmentation?", opts: ["A biology term", "Dividing your email list into groups based on behavior or interests", "Deleting subscribers", "A design technique"], a: 1 },
+      { q: "What does CTA stand for?", opts: ["Click The Ad", "Call To Action", "Customer Trust Assessment", "Content Type Analysis"], a: 1 },
+      { q: "What tool is popular for email marketing?", opts: ["Photoshop", "ConvertKit or Mailchimp", "Microsoft Word", "Zoom"], a: 1 },
+      { q: "What should you NEVER do with email?", opts: ["Provide value", "Buy email lists and spam people", "Segment your audience", "Test subject lines"], a: 1 }
+    ]}
   }
 };
 
@@ -952,6 +1186,10 @@ function showScreen(n) {
   document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
   document.getElementById('screen-' + n).classList.add('active');
   window.scrollTo(0, 0);
+}
+
+function showPaywall() {
+  document.getElementById('paywall-overlay').classList.remove('hidden');
 }
 
 function filterCourses(cat, btn) {
@@ -1001,17 +1239,20 @@ function renderCourses() {
     const isComplete = done === c.lessons.length;
     const certs = JSON.parse(localStorage.getItem('skillpay_certs') || '[]');
     const hasCert = certs.find(x => x.courseId === id);
-    grid.innerHTML += `<div class="course-card" data-cat="${c.cat}" onclick="openCourse('${id}')">
+    const isPro = c.tier === 'pro';
+    const hasProAccess = localStorage.getItem('skillpay_pro') === 'true';
+    grid.innerHTML += `<div class="course-card ${isPro && !hasProAccess ? 'pro-locked' : ''}" data-cat="${c.cat}" onclick="${isPro && !hasProAccess ? 'showPaywall()' : "openCourse('" + id + "')"}">
       <div class="course-thumb" style="background:linear-gradient(135deg,${c.color},${c.color}88)">
         <div class="course-thumb-icon">${c.icon}</div>
-        <div class="course-thumb-label">${isComplete ? '✓ Completed' : c.tag}</div>
+        ${isPro ? '<div class="pro-badge">PRO</div>' : ''}
+        <div class="course-thumb-label">${isComplete ? '✓ Completed' : isPro ? 'Premium' : c.tag}</div>
         <div class="course-thumb-lessons">${c.lessons.length} lessons</div>
       </div>
       <div class="course-body">
         <div class="course-subject" style="color:${c.color}">${c.subject}</div>
         <div class="course-title">${c.title}</div>
         <div class="course-desc">${c.desc}</div>
-        <div class="course-footer"><div class="course-meta"><span>${done}/${c.lessons.length} done</span><span>Beginner</span></div><div class="course-rating">${pct > 0 ? pct + '% complete' : '★ 4.8'}</div></div>
+        <div class="course-footer"><div class="course-meta"><span>${done > 0 ? done + '/' + c.lessons.length + ' done' : c.lessons.length + ' lessons'}</span><span>${c.difficulty}</span></div><div class="course-rating">${pct > 0 ? pct + '%' : isPro ? '&#128274; Pro' : '★ 4.8'}</div></div>
         <div class="prog-mini"><div class="prog-mini-fill" style="width:${pct}%"></div></div>
         ${hasCert ? `<div class="cert-badge" onclick="event.stopPropagation();viewCertificate('${id}')">&#127942; View certificate</div>` : ''}
       </div></div>`;
