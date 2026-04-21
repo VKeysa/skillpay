@@ -785,50 +785,8 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
           <div class="s-sub" id="stat-badges-sub">Complete actions to earn badges</div>
         </div>
       </div>
-      <div class="continue-card">
-        <div class="continue-left">
-          <h3>Make Your First $100 Online</h3>
-          <p>Next up: Lesson 3 — Land your first client or sale</p>
-          <div class="continue-meta">
-            <div class="c-meta-item">Progress: <span>35%</span></div>
-            <div class="c-meta-item">Next lesson: <span>~20 min</span></div>
-            <div class="c-meta-item">Lessons left: <span>3</span></div>
-          </div>
-          <div class="prog-wrap">
-            <div class="prog-label"><span>Lesson 2 complete</span><span>35%</span></div>
-            <div class="prog-bar"><div class="prog-fill" style="width:35%"></div></div>
-          </div>
-        </div>
-        <button class="continue-btn" onclick="window.location.href='skillpay-courses.html'">Continue learning</button>
-      </div>
-      <div class="section-heading">Course lessons</div>
-      <div class="lessons-list">
-        <div class="lesson-row">
-          <div class="l-num done">&#10003;</div>
-          <div class="l-info"><div class="l-title">Lesson 1 — Find your first income opportunity</div><div class="l-desc">Identify the best method for your situation</div></div>
-          <div class="l-tag done">Complete</div>
-        </div>
-        <div class="lesson-row">
-          <div class="l-num done">&#10003;</div>
-          <div class="l-info"><div class="l-title">Lesson 2 — Set up your digital presence</div><div class="l-desc">Build your profile and first offer</div></div>
-          <div class="l-tag done">Complete</div>
-        </div>
-        <div class="lesson-row current">
-          <div class="l-num current">3</div>
-          <div class="l-info"><div class="l-title">Lesson 3 — Land your first client or sale</div><div class="l-desc">Outreach, pitching, and closing your first deal</div></div>
-          <div class="l-tag current">In progress</div>
-        </div>
-        <div class="lesson-row">
-          <div class="l-num locked">4</div>
-          <div class="l-info"><div class="l-title locked">Lesson 4 — Scale past $100 consistently</div><div class="l-desc">Build systems that repeat your results</div></div>
-          <div class="l-tag locked">Locked</div>
-        </div>
-        <div class="lesson-row">
-          <div class="l-num locked">5</div>
-          <div class="l-info"><div class="l-title locked">Lesson 5 — Build a repeatable system</div><div class="l-desc">Automate and grow your income streams</div></div>
-          <div class="l-tag locked">Locked</div>
-        </div>
-      </div>
+      <div id="continue-section"></div>
+      <div id="lessons-section"></div>
 
       <!-- LEADERBOARD -->
       <div class="lb-section">
@@ -1190,6 +1148,79 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   window.renderGamification = renderGamification;
   window.updateStreak = updateStreak;
 
+  // ── DYNAMIC CONTINUE CARD ──
+  const DASH_COURSES = {
+    hundred: { title: 'Make Your First $100 Online', lessons: ['Find your first income opportunity','Set up your digital presence','Land your first client or sale','Scale past $100 consistently','Build a repeatable system'], times: ['20min','25min','30min','25min','20min'] },
+    freelancing: { title: 'Land Your First Freelance Client', lessons: ['Why freelancing is the fastest path','Choosing your niche and skill','Building your profile','Writing proposals that win','Landing your first client','Scaling to consistent income'], times: ['20min','25min','20min','30min','25min','25min'] },
+    content: { title: 'Grow to 1,000 Followers Fast', lessons: ['Why followers = money','Choosing your platform','Creating content that goes viral','Growing from 0 to 100','Monetizing at 1,000 followers','Scaling your content system','Building a content calendar'], times: ['15min','20min','25min','25min','30min','25min','20min'] }
+  };
+
+  function renderDashProgress() {
+    var progress = {};
+    try { progress = JSON.parse(localStorage.getItem('skillpay_progress') || '{}'); } catch(e) {}
+
+    var contEl = document.getElementById('continue-section');
+    var lessEl = document.getElementById('lessons-section');
+
+    // Find the most recently active course
+    var activeCourse = null;
+    var activeCourseId = null;
+    for (var id in DASH_COURSES) {
+      var p = progress[id] || [];
+      var done = p.filter(function(s){ return s === 'done'; }).length;
+      if (done > 0 && done < DASH_COURSES[id].lessons.length) {
+        activeCourse = DASH_COURSES[id];
+        activeCourseId = id;
+        break;
+      }
+    }
+
+    // If no course started, show a welcome card
+    if (!activeCourse) {
+      contEl.innerHTML = '<div class="continue-card"><div class="continue-left">' +
+        '<h3>Start your first course</h3>' +
+        '<p>Pick a skill, complete lessons, and earn your first income online.</p>' +
+        '<div class="continue-meta"><div class="c-meta-item">17 courses available</div><div class="c-meta-item">Start with any course</div></div>' +
+        '</div><button class="continue-btn" onclick="window.location.href=\'skillpay-courses.html\'">Browse courses</button></div>';
+      lessEl.innerHTML = '';
+      return;
+    }
+
+    var p = progress[activeCourseId] || [];
+    var done = p.filter(function(s){ return s === 'done'; }).length;
+    var total = activeCourse.lessons.length;
+    var pct = Math.round((done / total) * 100);
+    var nextLesson = done < total ? done : total - 1;
+    var left = total - done;
+
+    contEl.innerHTML = '<div class="continue-card"><div class="continue-left">' +
+      '<h3>' + activeCourse.title + '</h3>' +
+      '<p>Next up: Lesson ' + (nextLesson + 1) + ' — ' + activeCourse.lessons[nextLesson] + '</p>' +
+      '<div class="continue-meta">' +
+        '<div class="c-meta-item">Progress: <span>' + pct + '%</span></div>' +
+        '<div class="c-meta-item">Next lesson: <span>~' + activeCourse.times[nextLesson] + '</span></div>' +
+        '<div class="c-meta-item">Lessons left: <span>' + left + '</span></div>' +
+      '</div>' +
+      '<div class="prog-wrap"><div class="prog-label"><span>' + (done > 0 ? 'Lesson ' + done + ' complete' : 'Not started') + '</span><span>' + pct + '%</span></div>' +
+      '<div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%"></div></div></div>' +
+      '</div><button class="continue-btn" onclick="window.location.href=\'skillpay-courses.html\'">Continue learning</button></div>';
+
+    // Lessons list
+    var html = '<div class="section-heading">Course lessons</div><div class="lessons-list">';
+    activeCourse.lessons.forEach(function(l, i) {
+      var status = (p[i] || (i === 0 ? 'active' : 'locked'));
+      if (status === 'done') {
+        html += '<div class="lesson-row"><div class="l-num done">&#10003;</div><div class="l-info"><div class="l-title">Lesson ' + (i+1) + ' — ' + l + '</div></div><div class="l-tag done">Complete</div></div>';
+      } else if (status === 'active' || (i === done && done < total)) {
+        html += '<div class="lesson-row current"><div class="l-num current">' + (i+1) + '</div><div class="l-info"><div class="l-title">Lesson ' + (i+1) + ' — ' + l + '</div></div><div class="l-tag current">In progress</div></div>';
+      } else {
+        html += '<div class="lesson-row"><div class="l-num locked">' + (i+1) + '</div><div class="l-info"><div class="l-title locked">Lesson ' + (i+1) + ' — ' + l + '</div></div><div class="l-tag locked">Locked</div></div>';
+      }
+    });
+    html += '</div>';
+    lessEl.innerHTML = html;
+  }
+
   // ── LEADERBOARD ──
   var currentLBMode = 'weekly';
 
@@ -1476,6 +1507,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     checkBadges();
     renderDailyChallenge();
     renderLeaderboard();
+    renderDashProgress();
   });
 </script>
 
