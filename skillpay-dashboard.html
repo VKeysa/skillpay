@@ -129,6 +129,53 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
 }
 
 /* GAMIFICATION */
+
+/* LEADERBOARD */
+.lb-section{margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
+.lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.lb-tabs{display:flex;gap:4px;background:var(--cream-dark);padding:3px;border-radius:8px}
+.lb-tab{padding:6px 14px;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;background:transparent;transition:all 0.15s}
+.lb-tab.active{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:24px;padding:20px 0 0}
+.lb-podium-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lb-podium-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;border-radius:10px 10px 0 0;padding:16px 20px 12px;min-width:90px}
+.lb-podium-bar.gold{background:linear-gradient(180deg,rgba(201,147,58,0.15),rgba(201,147,58,0.06));height:140px;border:1px solid rgba(201,147,58,0.2);border-bottom:none}
+.lb-podium-bar.silver{background:linear-gradient(180deg,rgba(192,192,192,0.12),rgba(192,192,192,0.04));height:110px;border:1px solid rgba(192,192,192,0.15);border-bottom:none}
+.lb-podium-bar.bronze{background:linear-gradient(180deg,rgba(205,127,50,0.1),rgba(205,127,50,0.03));height:90px;border:1px solid rgba(205,127,50,0.12);border-bottom:none}
+.lb-podium-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-podium-name{font-size:12px;font-weight:600;color:var(--navy);text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-podium-xp{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-top:auto}
+.lb-podium-xp-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+.lb-rank-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-bottom:4px}
+.lb-rank-badge.r1{background:#C9933A}
+.lb-rank-badge.r2{background:#A0A0A0}
+.lb-rank-badge.r3{background:#CD7F32}
+.lb-list{display:flex;flex-direction:column;gap:6px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--white);border:1px solid var(--border);border-radius:10px;transition:all 0.15s}
+.lb-row:hover{box-shadow:0 2px 10px rgba(13,27,42,0.06)}
+.lb-row.you{border-color:var(--gold);background:rgba(201,147,58,0.04)}
+.lb-rank{width:28px;font-size:14px;font-weight:700;color:var(--muted);text-align:center;flex-shrink:0}
+.lb-row.you .lb-rank{color:var(--gold)}
+.lb-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-name{font-size:13px;font-weight:500;color:var(--navy);flex:1}
+.lb-row.you .lb-name{color:var(--gold);font-weight:600}
+.lb-you-tag{font-size:9px;background:rgba(201,147,58,0.12);color:var(--gold);padding:2px 6px;border-radius:10px;font-weight:600;margin-left:6px}
+.lb-xp{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy)}
+.lb-row.you .lb-xp{color:var(--gold)}
+.lb-level{font-size:11px;color:var(--muted);margin-left:4px;font-family:'DM Sans',sans-serif;font-weight:400}
+.lb-divider{text-align:center;padding:8px 0;font-size:11px;color:var(--muted)}
+[data-theme="dark"] .lb-row{background:#1C2128!important;border-color:#30363D!important}
+[data-theme="dark"] .lb-row.you{border-color:#C9933A!important;background:rgba(201,147,58,0.06)!important}
+[data-theme="dark"] .lb-name{color:#F0F6FC!important}
+[data-theme="dark"] .lb-row.you .lb-name{color:#C9933A!important}
+[data-theme="dark"] .lb-xp{color:#F0F6FC!important}
+[data-theme="dark"] .lb-row.you .lb-xp{color:#C9933A!important}
+[data-theme="dark"] .lb-podium-name{color:#F0F6FC!important}
+[data-theme="dark"] .lb-tabs{background:#161B22!important}
+[data-theme="dark"] .lb-tab.active{background:#1C2128!important;color:#F0F6FC!important}
+[data-theme="dark"] .lb-podium-bar.gold{background:linear-gradient(180deg,rgba(201,147,58,0.12),rgba(201,147,58,0.03))!important;border-color:rgba(201,147,58,0.15)!important}
+[data-theme="dark"] .lb-podium-bar.silver{background:linear-gradient(180deg,rgba(192,192,192,0.08),rgba(192,192,192,0.02))!important;border-color:rgba(192,192,192,0.1)!important}
+[data-theme="dark"] .lb-podium-bar.bronze{background:linear-gradient(180deg,rgba(205,127,50,0.08),rgba(205,127,50,0.02))!important;border-color:rgba(205,127,50,0.08)!important}
 .xp-card{background:var(--navy);border-radius:14px;padding:22px 26px;margin-bottom:20px}
 .xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .xp-level{display:flex;align-items:center;gap:12px}
@@ -689,6 +736,22 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         </div>
       </div>
 
+      <!-- LEADERBOARD -->
+      <div class="lb-section">
+        <div class="lb-header">
+          <div>
+            <div class="section-heading" style="margin-bottom:4px">Leaderboard</div>
+            <p style="font-size:13px;color:var(--muted);font-weight:300">Compete with other learners this week</p>
+          </div>
+          <div class="lb-tabs">
+            <button class="lb-tab active" onclick="switchLB('weekly',this)">This week</button>
+            <button class="lb-tab" onclick="switchLB('alltime',this)">All time</button>
+          </div>
+        </div>
+        <div id="lb-podium" class="lb-podium"></div>
+        <div id="lb-list" class="lb-list"></div>
+      </div>
+
       <!-- BADGES -->
       <div class="badges-section">
         <div class="badges-title">Your badges</div>
@@ -1033,6 +1096,108 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   window.renderGamification = renderGamification;
   window.updateStreak = updateStreak;
 
+  // ── LEADERBOARD ──
+  const SIMULATED_USERS = [
+    { name: 'Alex M.', xp: 2450, level: 'Master', color: '#185FA5', streak: 23 },
+    { name: 'Sarah K.', xp: 1890, level: 'Pro', color: '#993556', streak: 15 },
+    { name: 'Marcus T.', xp: 1620, level: 'Pro', color: '#1D9E75', streak: 12 },
+    { name: 'Priya R.', xp: 1340, level: 'Pro', color: '#534AB7', streak: 18 },
+    { name: 'Jake W.', xp: 1100, level: 'Pro', color: '#BA7517', streak: 9 },
+    { name: 'Emma L.', xp: 890, level: 'Hustler', color: '#993C1D', streak: 7 },
+    { name: 'Carlos D.', xp: 720, level: 'Hustler', color: '#185FA5', streak: 5 },
+    { name: 'Mia Z.', xp: 580, level: 'Hustler', color: '#3B6D11', streak: 11 },
+    { name: 'Ryan P.', xp: 410, level: 'Apprentice', color: '#A32D2D', streak: 4 },
+    { name: 'Nina F.', xp: 280, level: 'Apprentice', color: '#0F6E56', streak: 3 },
+    { name: 'David H.', xp: 190, level: 'Beginner', color: '#854F0B', streak: 2 },
+    { name: 'Sophie A.', xp: 120, level: 'Beginner', color: '#3C3489', streak: 1 }
+  ];
+
+  var currentLBMode = 'weekly';
+
+  function getLeaderboardData(mode) {
+    var g = getGamification();
+    var userName = localStorage.getItem('skillpay_student_name') || 'You';
+    var showOnLB = true;
+    try {
+      var settings = JSON.parse(localStorage.getItem('skillpay_settings') || '{}');
+      if (settings.leaderboard === false) showOnLB = false;
+    } catch(e) {}
+
+    var users = SIMULATED_USERS.map(function(u) {
+      var xp = mode === 'weekly' ? Math.round(u.xp * 0.3 + Math.random() * 50) : u.xp;
+      return { name: u.name, xp: xp, level: u.level, color: u.color, isYou: false };
+    });
+
+    if (showOnLB) {
+      var yourXP = mode === 'weekly' ? Math.round((g.xp || 0) * 0.8) : (g.xp || 0);
+      var level = getLevel(g.xp || 0);
+      users.push({ name: userName, xp: yourXP, level: level.name, color: '#C9933A', isYou: true });
+    }
+
+    users.sort(function(a, b) { return b.xp - a.xp; });
+    return users;
+  }
+
+  function renderLeaderboard(mode) {
+    currentLBMode = mode || currentLBMode;
+    var users = getLeaderboardData(currentLBMode);
+    var podiumEl = document.getElementById('lb-podium');
+    var listEl = document.getElementById('lb-list');
+
+    // Podium - top 3
+    var top3 = users.slice(0, 3);
+    var podiumOrder = [top3[1], top3[0], top3[2]]; // silver, gold, bronze
+    var ranks = ['silver', 'gold', 'bronze'];
+    var rankNums = [2, 1, 3];
+    var rankColors = ['#A0A0A0', '#C9933A', '#CD7F32'];
+
+    podiumEl.innerHTML = podiumOrder.map(function(u, i) {
+      if (!u) return '';
+      return '<div class="lb-podium-item">' +
+        '<div class="lb-podium-avatar" style="background:' + u.color + '">' + u.name.charAt(0) + '</div>' +
+        '<div class="lb-podium-name">' + u.name + (u.isYou ? ' (you)' : '') + '</div>' +
+        '<div class="lb-rank-badge r' + rankNums[i] + '">' + rankNums[i] + '</div>' +
+        '<div class="lb-podium-bar ' + ranks[i] + '">' +
+          '<div class="lb-podium-xp" style="color:' + rankColors[i] + '">' + u.xp.toLocaleString() + '</div>' +
+          '<div class="lb-podium-xp-label">XP</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // List - 4th place onwards + find user
+    var rest = users.slice(3);
+    var yourIndex = users.findIndex(function(u) { return u.isYou; });
+    var html = '';
+
+    rest.forEach(function(u, i) {
+      var rank = i + 4;
+      html += '<div class="lb-row' + (u.isYou ? ' you' : '') + '">' +
+        '<div class="lb-rank">' + rank + '</div>' +
+        '<div class="lb-avatar" style="background:' + u.color + '">' + u.name.charAt(0) + '</div>' +
+        '<div class="lb-name">' + u.name + (u.isYou ? '<span class="lb-you-tag">YOU</span>' : '') + '</div>' +
+        '<div class="lb-xp">' + u.xp.toLocaleString() + '<span class="lb-level"> ' + u.level + '</span></div>' +
+      '</div>';
+    });
+
+    // If user is in top 3, show a note
+    if (yourIndex >= 0 && yourIndex < 3) {
+      html = '<div class="lb-row you" style="margin-bottom:12px">' +
+        '<div class="lb-rank" style="font-size:18px">&#128081;</div>' +
+        '<div class="lb-avatar" style="background:#C9933A">' + users[yourIndex].name.charAt(0) + '</div>' +
+        '<div class="lb-name">You\'re #' + (yourIndex + 1) + ' this week!<span class="lb-you-tag">TOP 3</span></div>' +
+        '<div class="lb-xp">' + users[yourIndex].xp.toLocaleString() + '<span class="lb-level"> ' + users[yourIndex].level + '</span></div>' +
+      '</div>' + html;
+    }
+
+    listEl.innerHTML = html;
+  }
+
+  window.switchLB = function(mode, btn) {
+    document.querySelectorAll('.lb-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    renderLeaderboard(mode);
+  };
+
   // ── DAILY CHALLENGES ──
   const DAILY_CHALLENGES = [
     { icon: '&#128269;', title: 'Scout 3 freelance gigs', desc: 'Go to Fiverr or Upwork and find 3 gigs in your niche that you could realistically apply to. Save the links.' },
@@ -1221,6 +1386,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     renderGamification();
     checkBadges();
     renderDailyChallenge();
+    renderLeaderboard();
   });
 </script>
 
