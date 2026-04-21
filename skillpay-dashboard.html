@@ -1097,21 +1097,6 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   window.updateStreak = updateStreak;
 
   // ── LEADERBOARD ──
-  const SIMULATED_USERS = [
-    { name: 'Alex M.', xp: 2450, level: 'Master', color: '#185FA5', streak: 23 },
-    { name: 'Sarah K.', xp: 1890, level: 'Pro', color: '#993556', streak: 15 },
-    { name: 'Marcus T.', xp: 1620, level: 'Pro', color: '#1D9E75', streak: 12 },
-    { name: 'Priya R.', xp: 1340, level: 'Pro', color: '#534AB7', streak: 18 },
-    { name: 'Jake W.', xp: 1100, level: 'Pro', color: '#BA7517', streak: 9 },
-    { name: 'Emma L.', xp: 890, level: 'Hustler', color: '#993C1D', streak: 7 },
-    { name: 'Carlos D.', xp: 720, level: 'Hustler', color: '#185FA5', streak: 5 },
-    { name: 'Mia Z.', xp: 580, level: 'Hustler', color: '#3B6D11', streak: 11 },
-    { name: 'Ryan P.', xp: 410, level: 'Apprentice', color: '#A32D2D', streak: 4 },
-    { name: 'Nina F.', xp: 280, level: 'Apprentice', color: '#0F6E56', streak: 3 },
-    { name: 'David H.', xp: 190, level: 'Beginner', color: '#854F0B', streak: 2 },
-    { name: 'Sophie A.', xp: 120, level: 'Beginner', color: '#3C3489', streak: 1 }
-  ];
-
   var currentLBMode = 'weekly';
 
   function getLeaderboardData(mode) {
@@ -1123,12 +1108,9 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
       if (settings.leaderboard === false) showOnLB = false;
     } catch(e) {}
 
-    var users = SIMULATED_USERS.map(function(u) {
-      var xp = mode === 'weekly' ? Math.round(u.xp * 0.3 + Math.random() * 50) : u.xp;
-      return { name: u.name, xp: xp, level: u.level, color: u.color, isYou: false };
-    });
+    var users = [];
 
-    if (showOnLB) {
+    if (showOnLB && (g.xp || 0) > 0) {
       var yourXP = mode === 'weekly' ? Math.round((g.xp || 0) * 0.8) : (g.xp || 0);
       var level = getLevel(g.xp || 0);
       users.push({ name: userName, xp: yourXP, level: level.name, color: '#C9933A', isYou: true });
@@ -1144,9 +1126,35 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
     var podiumEl = document.getElementById('lb-podium');
     var listEl = document.getElementById('lb-list');
 
+    if (users.length === 0) {
+      podiumEl.innerHTML = '';
+      listEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;background:var(--white);border:1px solid var(--border);border-radius:10px">' +
+        '<div style="font-size:32px;margin-bottom:8px;opacity:0.3">&#127942;</div>' +
+        'No learners on the leaderboard yet. Complete lessons to earn XP and claim the #1 spot!</div>';
+      return;
+    }
+
+    // If only 1-2 users, skip podium and just show list
+    if (users.length < 3) {
+      podiumEl.innerHTML = '';
+      var html = '';
+      users.forEach(function(u, i) {
+        var rank = i + 1;
+        var rankColors = ['#C9933A', '#A0A0A0', '#CD7F32'];
+        html += '<div class="lb-row' + (u.isYou ? ' you' : '') + '">' +
+          '<div class="lb-rank" style="color:' + (rankColors[i] || 'var(--muted)') + ';font-size:18px">' + rank + '</div>' +
+          '<div class="lb-avatar" style="background:' + u.color + '">' + u.name.charAt(0) + '</div>' +
+          '<div class="lb-name">' + u.name + (u.isYou ? '<span class="lb-you-tag">YOU</span>' : '') + '</div>' +
+          '<div class="lb-xp">' + u.xp.toLocaleString() + '<span class="lb-level"> ' + u.level + '</span></div>' +
+        '</div>';
+      });
+      listEl.innerHTML = html;
+      return;
+    }
+
     // Podium - top 3
     var top3 = users.slice(0, 3);
-    var podiumOrder = [top3[1], top3[0], top3[2]]; // silver, gold, bronze
+    var podiumOrder = [top3[1], top3[0], top3[2]];
     var ranks = ['silver', 'gold', 'bronze'];
     var rankNums = [2, 1, 3];
     var rankColors = ['#A0A0A0', '#C9933A', '#CD7F32'];
@@ -1164,11 +1172,9 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
       '</div>';
     }).join('');
 
-    // List - 4th place onwards + find user
+    // Rest of list
     var rest = users.slice(3);
-    var yourIndex = users.findIndex(function(u) { return u.isYou; });
     var html = '';
-
     rest.forEach(function(u, i) {
       var rank = i + 4;
       html += '<div class="lb-row' + (u.isYou ? ' you' : '') + '">' +
@@ -1178,17 +1184,6 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         '<div class="lb-xp">' + u.xp.toLocaleString() + '<span class="lb-level"> ' + u.level + '</span></div>' +
       '</div>';
     });
-
-    // If user is in top 3, show a note
-    if (yourIndex >= 0 && yourIndex < 3) {
-      html = '<div class="lb-row you" style="margin-bottom:12px">' +
-        '<div class="lb-rank" style="font-size:18px">&#128081;</div>' +
-        '<div class="lb-avatar" style="background:#C9933A">' + users[yourIndex].name.charAt(0) + '</div>' +
-        '<div class="lb-name">You\'re #' + (yourIndex + 1) + ' this week!<span class="lb-you-tag">TOP 3</span></div>' +
-        '<div class="lb-xp">' + users[yourIndex].xp.toLocaleString() + '<span class="lb-level"> ' + users[yourIndex].level + '</span></div>' +
-      '</div>' + html;
-    }
-
     listEl.innerHTML = html;
   }
 
