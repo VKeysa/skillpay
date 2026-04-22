@@ -193,6 +193,37 @@ textarea.reflect-input:focus{border-color:var(--gold)}
 @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* PRO BADGE & PAYWALL */
+
+/* NOTES */
+.notes-area{padding:4px 0}
+.notes-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.notes-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--navy)}
+.notes-sub{font-size:12px;color:var(--muted);font-weight:300;margin-top:2px}
+.notes-save-status{font-size:11px;color:var(--green);font-weight:500;padding:4px 10px;border-radius:6px;background:rgba(29,158,117,0.08);opacity:0;transition:opacity 0.3s}
+.notes-save-status.show{opacity:1}
+.notes-input{width:100%;min-height:180px;padding:16px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--body);line-height:1.7;resize:vertical;outline:none;background:var(--white);transition:border-color 0.2s}
+.notes-input:focus{border-color:var(--gold)}
+.notes-input::placeholder{color:var(--muted)}
+.notes-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.notes-char-count{font-size:11px;color:var(--muted)}
+.notes-clear-btn{font-size:12px;color:var(--danger);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:4px;transition:background 0.15s}
+.notes-clear-btn:hover{background:rgba(226,75,74,0.08)}
+.notes-divider{height:1px;background:var(--border);margin:20px 0}
+.notes-all-header{margin-bottom:12px}
+.notes-entry{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px}
+.notes-entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.notes-entry-lesson{font-size:12px;font-weight:600;color:var(--navy)}
+.notes-entry-date{font-size:10px;color:var(--muted)}
+.notes-entry-text{font-size:13px;color:var(--body);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+.notes-empty{text-align:center;padding:24px;font-size:13px;color:var(--muted)}
+.notes-count{font-size:9px;background:var(--gold);color:#fff;border-radius:8px;padding:1px 5px;margin-left:4px;font-weight:700;min-width:14px;text-align:center;display:inline-block}
+.notes-count:empty{display:none}
+[data-theme="dark"] .notes-title{color:#F0F6FC!important}
+[data-theme="dark"] .notes-input{background:#0D1117!important;border-color:#30363D!important;color:#F0F6FC!important}
+[data-theme="dark"] .notes-input::placeholder{color:#484F58!important}
+[data-theme="dark"] .notes-entry{background:#161B22!important;border-color:#30363D!important}
+[data-theme="dark"] .notes-entry-lesson{color:#F0F6FC!important}
+[data-theme="dark"] .notes-entry-text{color:#C9D1D9!important}
 .pro-badge{position:absolute;top:12px;left:12px;background:linear-gradient(135deg,#C9933A,#E8B86D);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.8px;z-index:2}
 .course-card.pro-locked .course-thumb::after{content:'';position:absolute;inset:0;background:rgba(13,27,42,0.3)}
 .paywall-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
@@ -720,11 +751,33 @@ textarea.reflect-input:focus{border-color:var(--gold)}
         <button class="tab-btn" onclick="switchTab('task',this)">Task</button>
         <button class="tab-btn" onclick="switchTab('quiz',this)">Quiz</button>
         <button class="tab-btn" onclick="switchTab('reflection',this)">Reflection</button>
+        <button class="tab-btn" onclick="switchTab('notes',this)">Notes <span class="notes-count" id="notes-count"></span></button>
       </div>
       <div id="tab-explanation" class="tab-content active"><div class="explanation-body" id="explanation-body"></div></div>
       <div id="tab-task" class="tab-content"><div id="task-body"></div></div>
       <div id="tab-quiz" class="tab-content"><div id="quiz-body"></div></div>
       <div id="tab-reflection" class="tab-content"><div id="reflection-body"></div></div>
+      <div id="tab-notes" class="tab-content">
+        <div class="notes-area">
+          <div class="notes-header">
+            <div>
+              <div class="notes-title">Your notes</div>
+              <div class="notes-sub" id="notes-lesson-label">for this lesson</div>
+            </div>
+            <div class="notes-save-status" id="notes-save-status"></div>
+          </div>
+          <textarea class="notes-input" id="notes-input" placeholder="Type your notes here... They auto-save as you type."></textarea>
+          <div class="notes-footer">
+            <div class="notes-char-count" id="notes-char-count">0 characters</div>
+            <button class="notes-clear-btn" onclick="clearCurrentNote()">Clear note</button>
+          </div>
+          <div class="notes-divider"></div>
+          <div class="notes-all-header">
+            <div class="notes-title" style="font-size:14px">All notes for this course</div>
+          </div>
+          <div id="notes-all-list"></div>
+        </div>
+      </div>
       <div class="lesson-nav">
         <button class="lesson-nav-btn" id="prev-btn" onclick="navigateLesson(-1)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Previous</button>
         <button class="lesson-nav-btn primary" id="next-btn" onclick="navigateLesson(1)">Next lesson<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 11l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
@@ -1437,6 +1490,7 @@ async function openLesson(courseId, index) {
   document.getElementById('next-btn').textContent = index === c.lessons.length - 1 ? 'Finish course' : 'Next lesson';
 
   switchTab('explanation', document.querySelector('.tab-btn'));
+  loadNote();
   showScreen('lesson');
 }
 
@@ -1534,6 +1588,131 @@ async function submitReflection(n, lessonTitle) {
   const g = getGamification(); g.reflectionsSubmitted = (g.reflectionsSubmitted || 0) + 1; saveGamification(g);
   addXP(10, 'Reflection submitted');
 }
+
+// ── NOTES SYSTEM ──
+var notesSaveTimer = null;
+
+function getNotesKey(courseId, lessonIndex) {
+  return 'skillpay_notes_' + courseId + '_' + lessonIndex;
+}
+
+function getAllNotesKey(courseId) {
+  return 'skillpay_notes_index_' + courseId;
+}
+
+function loadNote() {
+  if (!currentCourse) return;
+  var key = getNotesKey(currentCourse, currentLessonIndex);
+  var note = localStorage.getItem(key) || '';
+  var input = document.getElementById('notes-input');
+  if (input) {
+    input.value = note;
+    document.getElementById('notes-char-count').textContent = note.length + ' characters';
+  }
+  var c = COURSES[currentCourse];
+  var label = document.getElementById('notes-lesson-label');
+  if (label && c) label.textContent = 'Lesson ' + (currentLessonIndex + 1) + ' — ' + c.lessons[currentLessonIndex].title;
+  updateNoteCount();
+  renderAllNotes();
+}
+
+function saveNote() {
+  if (!currentCourse) return;
+  var input = document.getElementById('notes-input');
+  if (!input) return;
+  var text = input.value;
+  var key = getNotesKey(currentCourse, currentLessonIndex);
+
+  if (text.trim()) {
+    localStorage.setItem(key, text);
+    trackNoteIndex(currentCourse, currentLessonIndex);
+  } else {
+    localStorage.removeItem(key);
+    removeNoteIndex(currentCourse, currentLessonIndex);
+  }
+
+  document.getElementById('notes-char-count').textContent = text.length + ' characters';
+  var status = document.getElementById('notes-save-status');
+  status.textContent = 'Saved ✓';
+  status.classList.add('show');
+  setTimeout(function() { status.classList.remove('show'); }, 1500);
+  updateNoteCount();
+  renderAllNotes();
+}
+
+function trackNoteIndex(courseId, lessonIndex) {
+  var key = getAllNotesKey(courseId);
+  var indices = [];
+  try { indices = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  if (indices.indexOf(lessonIndex) === -1) {
+    indices.push(lessonIndex);
+    indices.sort(function(a,b){return a-b;});
+    localStorage.setItem(key, JSON.stringify(indices));
+  }
+}
+
+function removeNoteIndex(courseId, lessonIndex) {
+  var key = getAllNotesKey(courseId);
+  var indices = [];
+  try { indices = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  indices = indices.filter(function(i) { return i !== lessonIndex; });
+  localStorage.setItem(key, JSON.stringify(indices));
+}
+
+function updateNoteCount() {
+  if (!currentCourse) return;
+  var key = getAllNotesKey(currentCourse);
+  var indices = [];
+  try { indices = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  var badge = document.getElementById('notes-count');
+  if (badge) badge.textContent = indices.length > 0 ? indices.length : '';
+}
+
+function renderAllNotes() {
+  if (!currentCourse) return;
+  var list = document.getElementById('notes-all-list');
+  if (!list) return;
+  var key = getAllNotesKey(currentCourse);
+  var indices = [];
+  try { indices = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  var c = COURSES[currentCourse];
+
+  if (indices.length === 0) {
+    list.innerHTML = '<div class="notes-empty">No notes yet for this course. Start typing above!</div>';
+    return;
+  }
+
+  list.innerHTML = indices.map(function(i) {
+    var noteKey = getNotesKey(currentCourse, i);
+    var text = localStorage.getItem(noteKey) || '';
+    if (!text.trim()) return '';
+    var lessonTitle = c.lessons[i] ? c.lessons[i].title : 'Lesson ' + (i + 1);
+    var preview = text.length > 150 ? text.substring(0, 150) + '...' : text;
+    var isCurrent = i === currentLessonIndex;
+    return '<div class="notes-entry" style="' + (isCurrent ? 'border-color:var(--gold)' : '') + '">' +
+      '<div class="notes-entry-header">' +
+        '<div class="notes-entry-lesson">Lesson ' + (i + 1) + ' — ' + lessonTitle + '</div>' +
+        (isCurrent ? '<div style="font-size:10px;color:var(--gold);font-weight:600">CURRENT</div>' : '') +
+      '</div>' +
+      '<div class="notes-entry-text">' + preview.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>' +
+    '</div>';
+  }).filter(function(h) { return h; }).join('');
+}
+
+function clearCurrentNote() {
+  if (!confirm('Clear this note?')) return;
+  var input = document.getElementById('notes-input');
+  if (input) input.value = '';
+  saveNote();
+}
+
+// Auto-save on typing
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'notes-input') {
+    clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(saveNote, 800);
+  }
+});
 
 function completeLesson() {
   const c = COURSES[currentCourse];
