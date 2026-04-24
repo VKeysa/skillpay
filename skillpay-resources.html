@@ -351,6 +351,16 @@ var TOOL_BUILDERS = {
       '<div class="tool-field"><label>Paste the client message or job posting</label><textarea id="tool-message" rows="6" placeholder="Paste the full message or job description here..."></textarea></div>' +
       '<button class="tool-generate" onclick="checkRedFlags()">Analyze for red flags</button>' +
       '<div id="tool-output" class="tool-output"></div></div>';
+  },
+  'expense-tracker': function() {
+    return '<div class="tool-form">' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:14px">Track your side hustle income and expenses to see your real profit.</div>' +
+      '<div class="tool-field"><label>Entry type</label><select id="tool-type"><option>Income</option><option>Expense</option></select></div>' +
+      '<div class="tool-field"><label>Amount ($)</label><input type="number" id="tool-amount" placeholder="150"></div>' +
+      '<div class="tool-field"><label>Description</label><input type="text" id="tool-desc" placeholder="Client payment, domain cost, software subscription..."></div>' +
+      '<div class="tool-field"><label>Category</label><select id="tool-category"><option>Client payment</option><option>Product sale</option><option>Affiliate commission</option><option>Domain/hosting</option><option>Software/tools</option><option>Marketing/ads</option><option>Equipment</option><option>Other</option></select></div>' +
+      '<button class="tool-generate" onclick="addExpenseEntry()">Add entry</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
   }
 };
 
@@ -480,6 +490,91 @@ function copyToolText(btn) {
     btn.style.background = '#1D9E75';
     setTimeout(function() { btn.textContent = 'Copy'; btn.style.background = ''; }, 1500);
   });
+}
+
+function addExpenseEntry() {
+  var type = document.getElementById('tool-type').value;
+  var amount = parseFloat(document.getElementById('tool-amount').value) || 0;
+  var desc = document.getElementById('tool-desc').value.trim();
+  var category = document.getElementById('tool-category').value;
+  
+  if (!amount || !desc) { alert('Please fill in amount and description.'); return; }
+  
+  var entries = [];
+  try { entries = JSON.parse(localStorage.getItem('skillpay_expense_tracker') || '[]'); } catch(e) {}
+  
+  entries.push({
+    type: type,
+    amount: amount,
+    desc: desc,
+    category: category,
+    date: new Date().toISOString().split('T')[0]
+  });
+  
+  localStorage.setItem('skillpay_expense_tracker', JSON.stringify(entries));
+  
+  // Clear form
+  document.getElementById('tool-amount').value = '';
+  document.getElementById('tool-desc').value = '';
+  
+  // Render tracker
+  renderExpenseTracker(entries);
+}
+
+function renderExpenseTracker(entries) {
+  var totalIncome = 0;
+  var totalExpenses = 0;
+  
+  entries.forEach(function(e) {
+    if (e.type === 'Income') totalIncome += e.amount;
+    else totalExpenses += e.amount;
+  });
+  
+  var profit = totalIncome - totalExpenses;
+  var taxEstimate = profit > 0 ? profit * 0.25 : 0; // 25% tax estimate
+  var netProfit = profit - taxEstimate;
+  
+  var out = document.getElementById('tool-output');
+  var html = '<div class="tool-result"><div class="tool-result-title">Your side hustle summary</div>' +
+    '<div class="tool-result-grid">' +
+      '<div class="tool-stat"><div class="tool-stat-val" style="color:#1D9E75">$' + totalIncome.toFixed(2) + '</div><div class="tool-stat-label">Total income</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val" style="color:#E24B4A">$' + totalExpenses.toFixed(2) + '</div><div class="tool-stat-label">Total expenses</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + profit.toFixed(2) + '</div><div class="tool-stat-label">Profit</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val" style="color:#C9933A">$' + taxEstimate.toFixed(2) + '</div><div class="tool-stat-label">Tax estimate (25%)</div></div>' +
+    '</div>' +
+    '<div class="tool-result-text" style="margin-top:12px;font-weight:600;color:' + (netProfit >= 0 ? '#1D9E75' : '#E24B4A') + '">Net profit after taxes: $' + netProfit.toFixed(2) + '</div></div>';
+  
+  // Recent entries
+  html += '<div class="tool-result"><div class="tool-result-title">Recent entries (' + entries.length + ' total)</div>';
+  entries.slice(-5).reverse().forEach(function(e) {
+    var color = e.type === 'Income' ? '#1D9E75' : '#E24B4A';
+    html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div style="font-size:13px;color:var(--navy);font-weight:500">' + e.desc + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px">' + e.category + ' • ' + e.date + '</div></div>' +
+      '<div style="font-size:14px;font-weight:600;color:' + color + '">' + (e.type === 'Income' ? '+' : '-') + '$' + e.amount.toFixed(2) + '</div>' +
+    '</div>';
+  });
+  html += '<button class="tool-copy" onclick="clearExpenseTracker()" style="background:#E24B4A;margin-top:10px">Clear all entries</button></div>';
+  
+  out.innerHTML = html;
+}
+
+function clearExpenseTracker() {
+  if (!confirm('Clear all expense tracker entries? This cannot be undone.')) return;
+  localStorage.removeItem('skillpay_expense_tracker');
+  document.getElementById('tool-output').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">All entries cleared. Add your first entry above.</div>';
+}
+
+// Load existing entries on tool open
+if (typeof TOOL_BUILDERS !== 'undefined' && TOOL_BUILDERS['expense-tracker']) {
+  var originalBuilder = TOOL_BUILDERS['expense-tracker'];
+  TOOL_BUILDERS['expense-tracker'] = function() {
+    setTimeout(function() {
+      var entries = [];
+      try { entries = JSON.parse(localStorage.getItem('skillpay_expense_tracker') || '[]'); } catch(e) {}
+      if (entries.length > 0) renderExpenseTracker(entries);
+    }, 100);
+    return originalBuilder();
+  };
 }
 
 function renderResources(filter) {
