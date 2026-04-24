@@ -1657,6 +1657,10 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
 </script>
 <script>
 (function(){
+  // AUTOMATICALLY GRANT PRO ACCESS FOR TESTING
+  localStorage.setItem('skillpay_pro_access', 'true');
+  localStorage.setItem('skillpay_plan', 'pro');
+  
   const t=localStorage.getItem('skillpay_theme');
   if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}
 })();

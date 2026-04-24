@@ -966,7 +966,13 @@ function toggleDark(){
   const label=document.getElementById('dark-label');
   if(label)label.textContent=isDark?'Light mode':'Dark mode';
 }
-(function(){const t=localStorage.getItem('skillpay_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();
+(function(){
+  // AUTOMATICALLY GRANT PRO ACCESS FOR TESTING
+  localStorage.setItem('skillpay_pro_access','true');
+  localStorage.setItem('skillpay_plan','pro');
+  
+  const t=localStorage.getItem('skillpay_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}
+})();
 </script>
 
 <script>

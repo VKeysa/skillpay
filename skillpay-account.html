@@ -687,6 +687,10 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   };
 
   const app = initializeApp(firebaseConfig);
+  // AUTOMATICALLY GRANT PRO ACCESS FOR TESTING
+  localStorage.setItem('skillpay_pro_access', 'true');
+  localStorage.setItem('skillpay_plan', 'pro');
+  
   const auth = getAuth(app);
 
   onAuthStateChanged(auth, (user) => {
@@ -716,6 +720,16 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
         el.textContent = firstName.charAt(0).toUpperCase();
       }
     });
+
+    // Update plan display to Pro
+    const isPro = localStorage.getItem('skillpay_pro_access') === 'true';
+    const planText = isPro ? 'Pro plan' : 'Free plan';
+    const badgeClass = isPro ? 'pro' : 'free';
+    
+    document.getElementById('side-plan').textContent = planText;
+    const badge = document.getElementById('profile-badge');
+    badge.textContent = planText;
+    badge.className = `profile-badge ${badgeClass}`;
 
     // Load gamification stats
     try {
