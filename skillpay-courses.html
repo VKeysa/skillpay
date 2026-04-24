@@ -749,7 +749,6 @@ textarea.reflect-input:focus{border-color:var(--gold)}
         <h2 id="lesson-title"></h2>
         <div class="lesson-tags" id="lesson-tags"></div>
       </div>
-      <div class="video-wrap"><div class="video-bg"><div class="play-btn"><div class="play-icon"></div></div><div class="video-label" id="video-label">Watch lesson video</div></div></div>
       <div class="lesson-tabs">
         <button class="tab-btn active" onclick="switchTab('explanation',this)">Explanation</button>
         <button class="tab-btn" onclick="switchTab('task',this)">Task</button>
@@ -1544,8 +1543,7 @@ async function openLesson(courseId, index) {
   
   document.getElementById('lesson-breadcrumb').innerHTML = `Courses / <span onclick="showScreen('lesson-list')">${c.title}</span>`;
   document.getElementById('lesson-title').textContent = `Lesson ${index + 1} — ${l.title}`;
-  document.getElementById('video-label').textContent = `Lesson ${index + 1}: ${l.title}`;
-  document.getElementById('lesson-tags').innerHTML = `<span class="lesson-tag">${l.time}</span><span class="lesson-tag">${c.difficulty}</span><span class="lesson-tag">Video + Text</span>`;
+  document.getElementById('lesson-tags').innerHTML = `<span class="lesson-tag">${l.time}</span><span class="lesson-tag">${c.difficulty}</span><span class="lesson-tag">Text-based</span>`;
 
   // Explanation — use pre-written content immediately
   document.getElementById('explanation-body').innerHTML = content.exp;
