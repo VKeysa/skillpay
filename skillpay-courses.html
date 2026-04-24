@@ -1961,7 +1961,7 @@ function renderCourses() {
     const certs = JSON.parse(localStorage.getItem('skillpay_certs') || '[]');
     const hasCert = certs.find(x => x.courseId === id);
     const isPro = c.tier === 'pro';
-    const hasProAccess = localStorage.getItem('skillpay_pro') === 'true';
+    const hasProAccess = localStorage.getItem('skillpay_pro_access') === 'true' || localStorage.getItem('skillpay_pro') === 'true';
     grid.innerHTML += `<div class="course-card ${isPro && !hasProAccess ? 'pro-locked' : ''}" data-cat="${c.cat}" onclick="${isPro && !hasProAccess ? 'showPaywall()' : "openCourse('" + id + "')"}">
       <div class="course-thumb" style="background:linear-gradient(135deg,${c.color},${c.color}88)">
         ${THUMBS[id] || '<div class="course-thumb-icon">' + c.icon + '</div>'}
@@ -2458,6 +2458,7 @@ function toggleDark(){
 (function(){
   // AUTOMATICALLY GRANT PRO ACCESS FOR TESTING  
   localStorage.setItem('skillpay_pro_access','true');
+  localStorage.setItem('skillpay_pro','true');
   localStorage.setItem('skillpay_plan','pro');
   
   const t=localStorage.getItem('skillpay_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}

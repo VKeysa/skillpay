@@ -689,6 +689,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
   const app = initializeApp(firebaseConfig);
   // AUTOMATICALLY GRANT PRO ACCESS FOR TESTING
   localStorage.setItem('skillpay_pro_access', 'true');
+  localStorage.setItem('skillpay_pro', 'true');
   localStorage.setItem('skillpay_plan', 'pro');
   
   const auth = getAuth(app);
