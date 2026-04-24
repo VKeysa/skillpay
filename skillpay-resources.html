@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPay — Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D1B2A;--navy-mid:#1A2E45;--navy-light:#243B55;
+  --gold:#C9933A;--gold-light:#E8B86D;
+  --cream:#F9F5EF;--cream-dark:#EDE8DF;
+  --white:#FFFFFF;--muted:#7A8A9A;--body:#2C3E50;--border:#DDD8CE;
+  --green:#1D9E75;--purple:#534AB7;--blue:#185FA5;--danger:#E24B4A;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--body);font-size:15px;min-height:100vh}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2}
+
+.app-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sidebar-logo{font-family:'Playfair Display',serif;color:var(--white);font-size:18px;font-weight:700;padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo span{color:var(--gold)}
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.nav-item.active{background:rgba(201,147,58,0.15);color:var(--gold-light)}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.sidebar-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07)}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--white);flex-shrink:0}
+.user-name{font-size:13px;color:rgba(255,255,255,0.8);font-weight:500}
+.user-plan{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px}
+
+.store-main{padding:36px;overflow-y:auto}
+.page-header{margin-bottom:28px}
+.page-header h2{font-size:28px;color:var(--navy);margin-bottom:4px}
+.page-header p{font-size:14px;color:var(--muted);font-weight:300}
+
+/* Filter */
+.store-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.sf-btn{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.sf-btn:hover{border-color:var(--navy);color:var(--navy)}
+.sf-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+
+/* Stats */
+.store-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.store-stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;text-align:center}
+.store-stat-val{font-family:'Playfair Display',serif;font-size:24px;color:var(--navy);font-weight:700}
+.store-stat-label{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* Resource grid */
+.resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.resource-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.2s;display:flex;flex-direction:column}
+.resource-card:hover{box-shadow:0 6px 24px rgba(13,27,42,0.08);transform:translateY(-2px)}
+.resource-thumb{height:120px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.resource-thumb-icon{font-size:36px;position:relative;z-index:1}
+.resource-thumb-label{position:absolute;top:10px;left:10px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.5px;z-index:2}
+.resource-thumb-label.free{background:rgba(29,158,117,0.15);color:#1D9E75}
+.resource-thumb-label.paid{background:rgba(201,147,58,0.15);color:var(--gold)}
+.resource-thumb-label.pro{background:linear-gradient(135deg,#C9933A,#E8B86D);color:#fff}
+.resource-body{padding:18px;flex:1;display:flex;flex-direction:column}
+.resource-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px}
+.resource-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.resource-desc{font-size:12px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;flex:1}
+.resource-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.resource-price{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--navy)}
+.resource-price.free{color:var(--green)}
+.resource-price span{font-size:11px;color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif}
+.resource-btn{padding:8px 16px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.resource-btn.download{background:var(--green);color:#fff}
+.resource-btn.download:hover{background:#178A64}
+.resource-btn.buy{background:var(--gold);color:#fff}
+.resource-btn.buy:hover{background:var(--gold-light)}
+.resource-btn.pro-only{background:var(--navy);color:#fff}
+.resource-btn.pro-only:hover{background:var(--navy-mid)}
+
+/* Preview modal */
+.preview-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.85);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.preview-overlay.show{display:flex}
+.preview-modal{background:var(--white);border-radius:18px;max-width:560px;width:92%;max-height:85vh;overflow-y:auto;animation:modalIn 0.3s ease}
+@keyframes modalIn{from{transform:scale(0.95);opacity:0}to{transform:scale(1);opacity:1}}
+.preview-modal-header{padding:28px 28px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.preview-modal-header h3{font-size:20px;color:var(--navy);flex:1;margin-right:16px}
+.preview-modal-close{width:32px;height:32px;border-radius:50%;background:var(--cream);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0}
+.preview-modal-close:hover{background:var(--cream-dark);color:var(--navy)}
+.preview-modal-body{padding:20px 28px 28px}
+.preview-modal-cat{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:12px}
+.preview-modal-desc{font-size:14px;color:var(--body);line-height:1.7;margin-bottom:20px}
+.preview-modal-includes{margin-bottom:24px}
+.preview-modal-includes h4{font-size:14px;color:var(--navy);margin-bottom:10px;font-family:'DM Sans',sans-serif;font-weight:600}
+.pmi-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:var(--body)}
+.pmi-icon{width:20px;height:20px;border-radius:50%;background:rgba(29,158,117,0.1);color:var(--green);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.preview-modal-footer{display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--border)}
+.preview-modal-price{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy)}
+.preview-modal-price.free{color:var(--green)}
+.preview-modal-btn{padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.preview-modal-btn.download{background:var(--green);color:#fff}
+.preview-modal-btn.buy{background:var(--gold);color:#fff}
+
+/* Interactive Tools */
+.tool-form{padding:4px 0}
+.tool-field{margin-bottom:14px}
+.tool-field label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:5px}
+.tool-field input,.tool-field select,.tool-field textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--body);outline:none;background:var(--white);transition:border-color 0.2s}
+.tool-field input:focus,.tool-field select:focus,.tool-field textarea:focus{border-color:var(--gold)}
+.tool-field textarea{resize:vertical;line-height:1.6}
+.tool-generate{width:100%;padding:12px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:4px}
+.tool-generate:hover{background:var(--gold-light)}
+.tool-output{margin-top:18px}
+.tool-output:empty{display:none}
+.tool-result{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+.tool-result-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px}
+.tool-result-text{font-size:13px;color:var(--body);line-height:1.7;white-space:pre-wrap;word-wrap:break-word}
+.tool-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tool-stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.tool-stat-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--navy)}
+.tool-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.tool-copy{margin-top:8px;padding:6px 14px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:background 0.2s}
+.tool-copy:hover{background:var(--gold)}
+.resource-thumb-label.tool{background:rgba(83,74,183,0.15);color:#534AB7}
+[data-theme="dark"] .tool-field input,[data-theme="dark"] .tool-field select,[data-theme="dark"] .tool-field textarea{background:#0D1117!important;border-color:#30363D!important;color:#F0F6FC!important}
+[data-theme="dark"] .tool-field label{color:#F0F6FC!important}
+[data-theme="dark"] .tool-result{background:#0D1117!important;border-color:#30363D!important}
+[data-theme="dark"] .tool-result-title{color:#F0F6FC!important}
+[data-theme="dark"] .tool-result-text{color:#C9D1D9!important}
+[data-theme="dark"] .tool-stat{background:#1C2128!important;border-color:#30363D!important}
+[data-theme="dark"] .tool-stat-val{color:#F0F6FC!important}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--navy);z-index:999;padding:0 16px;align-items:center;justify-content:space-between}
+.mobile-nav-logo{font-family:'Playfair Display',serif;color:#fff;font-size:18px;font-weight:700}
+.mobile-nav-logo span{color:#C9933A}
+.hamburger{width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;background:none;border:none;padding:0}
+.hamburger span{display:block;width:22px;height:2px;background:rgba(255,255,255,0.7);border-radius:1px;transition:all 0.3s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-menu{display:none;position:fixed;inset:0;top:56px;background:var(--navy);z-index:998;padding:20px;overflow-y:auto}
+.mobile-menu.open{display:block}
+.mobile-menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;font-size:15px;color:rgba(255,255,255,0.65);cursor:pointer;transition:all 0.15s;margin-bottom:4px;text-decoration:none}
+.mobile-menu-item:hover,.mobile-menu-item.active{background:rgba(201,147,58,0.15);color:#E8B86D}
+.mobile-menu-item svg{width:18px;height:18px;flex-shrink:0}
+
+/* Dark mode */
+[data-theme="dark"]{--cream:#0D1117;--cream-dark:#161B22;--white:#1C2128;--body:#C9D1D9;--muted:#8B949E;--border:#30363D}
+[data-theme="dark"] body{background:#0D1117;color:#C9D1D9}
+[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4{color:#F0F6FC!important}
+[data-theme="dark"] .resource-card{background:#1C2128!important;border-color:#30363D!important}
+[data-theme="dark"] .resource-title{color:#F0F6FC!important}
+[data-theme="dark"] .resource-price{color:#F0F6FC!important}
+[data-theme="dark"] .store-stat{background:#1C2128!important;border-color:#30363D!important}
+[data-theme="dark"] .store-stat-val{color:#F0F6FC!important}
+[data-theme="dark"] .sf-btn{background:#1C2128!important;border-color:#30363D!important;color:#8B949E!important}
+[data-theme="dark"] .sf-btn.active{background:#C9933A!important;color:#fff!important;border-color:#C9933A!important}
+[data-theme="dark"] .preview-modal{background:#161B22!important}
+[data-theme="dark"] .preview-modal-header h3{color:#F0F6FC!important}
+[data-theme="dark"] .preview-modal-close{background:#1C2128!important;color:#8B949E!important}
+[data-theme="dark"] .preview-modal-price{color:#F0F6FC!important}
+
+@media(max-width:768px){
+  .mobile-nav{display:flex}
+  .sidebar{display:none!important}
+  .app-layout{grid-template-columns:1fr!important}
+  .store-main{padding:72px 16px 24px!important}
+  .resource-grid{grid-template-columns:1fr!important}
+  .store-stats{grid-template-columns:repeat(3,1fr)}
+  .store-filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-logo">Skill<span>Pay</span></div>
+  <button class="hamburger" onclick="toggleMobileMenu(this)">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+<div class="mobile-menu" id="mobile-menu">
+  <a class="mobile-menu-item" href="skillpay-dashboard.html">
+    <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+    Dashboard
+  </a>
+  <a class="mobile-menu-item" href="skillpay-courses.html">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    My courses
+  </a>
+  <a class="mobile-menu-item active" href="skillpay-resources.html">
+    <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6h6M5 8.5h4M5 11h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    Resources
+  </a>
+  <a class="mobile-menu-item" href="skillpay-progress.html">
+    <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Progress
+  </a>
+  <a class="mobile-menu-item" href="skillpay-account.html">
+    <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Account
+  </a>
+</div>
+
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">Skill<span>Pay</span></div>
+    <div class="sidebar-nav">
+      <div class="nav-item" onclick="window.location.href='skillpay-dashboard.html'">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="window.location.href='skillpay-courses.html'">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        My courses
+      </div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6h6M5 8.5h4M5 11h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Resources
+      </div>
+      <div class="nav-item" onclick="window.location.href='skillpay-progress.html'">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Progress
+      </div>
+      <div class="nav-item" onclick="window.location.href='skillpay-account.html'">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Account
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="avatar">S</div>
+        <div>
+          <div class="user-name">Student</div>
+          <div class="user-plan">Free plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="store-main">
+    <div class="page-header">
+      <h2>Resource store</h2>
+      <p>Interactive tools and generators built exclusively for SkillPay learners.</p>
+    </div>
+
+    <div class="store-stats">
+      <div class="store-stat">
+        <div class="store-stat-val" id="rs-total">12</div>
+        <div class="store-stat-label">Tools</div>
+      </div>
+      <div class="store-stat">
+        <div class="store-stat-val" id="rs-free">6</div>
+        <div class="store-stat-label">Free tools</div>
+      </div>
+      <div class="store-stat">
+        <div class="store-stat-val" id="rs-owned">0</div>
+        <div class="store-stat-label">Unlocked</div>
+      </div>
+    </div>
+
+    <div class="store-filters">
+      <button class="sf-btn active" onclick="filterResources('all',this)">All</button>
+      <button class="sf-btn" onclick="filterResources('freelancing',this)">Freelancing</button>
+      <button class="sf-btn" onclick="filterResources('content',this)">Content</button>
+      <button class="sf-btn" onclick="filterResources('trading',this)">Trading</button>
+      <button class="sf-btn" onclick="filterResources('business',this)">Business</button>
+      <button class="sf-btn" onclick="filterResources('free',this)">Free only</button>
+    </div>
+
+    <div class="resource-grid" id="resource-grid"></div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="preview-overlay" id="preview-overlay">
+  <div class="preview-modal">
+    <div class="preview-modal-header">
+      <h3 id="pm-title">Resource</h3>
+      <button class="preview-modal-close" onclick="closePreview()">&times;</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-modal-cat" id="pm-cat">Category</div>
+      <div class="preview-modal-desc" id="pm-desc">Description</div>
+      <div class="preview-modal-includes" id="pm-includes"></div>
+      <div class="preview-modal-footer">
+        <div class="preview-modal-price" id="pm-price">Free</div>
+        <button class="preview-modal-btn" id="pm-btn">Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var RESOURCES = [
+  { id: 'email-gen', title: 'Cold Email Generator', desc: 'Answer 4 questions about your service and target client — instantly get 3 personalized cold emails ready to send. Built on SkillPay\'s proven outreach framework.', cat: 'freelancing tools', color: '#185FA5', icon: '&#128231;', price: 0, type: 'tool', includes: ['3 personalized emails generated', 'Subject lines with 40%+ open rates', 'Follow-up sequence included', 'Copy to clipboard with one click'] },
+  { id: 'rate-calc', title: 'Freelance Rate Calculator', desc: 'Enter your expenses, desired income, and hours — get your exact hourly and project rates. Includes market rate comparison for your skill.', cat: 'freelancing tools', color: '#185FA5', icon: '&#128178;', price: 0, type: 'tool', includes: ['Personalized rate calculation', 'Market rate comparison', 'Project vs hourly breakdown', 'Rate justification script for clients'] },
+  { id: 'hook-gen', title: 'Viral Hook Generator', desc: 'Pick your niche, content type, and goal — get 10 custom viral hooks you can use immediately. Each hook uses SkillPay\'s 5 proven hook formulas.', cat: 'content tools', color: '#993556', icon: '&#128293;', price: 0, pro: true, type: 'tool', includes: ['10 custom hooks per generation', '5 proprietary hook formulas', 'Sorted by content type (Reel, TikTok, post)', 'Unlimited regeneration'] },
+  { id: 'proposal-builder', title: 'Proposal Builder', desc: 'Fill in your service, client name, and project details — get a professional proposal formatted and ready to send. Uses the exact structure that won $50K+ in contracts.', cat: 'freelancing tools', color: '#534AB7', icon: '&#9998;', price: 0, pro: true, type: 'tool', includes: ['Custom-generated proposal', 'Professional formatting', 'Pricing section with value framing', 'Export as text or copy to clipboard'] },
+  { id: 'position-calc', title: 'Trade Position Calculator', desc: 'Enter your account size, risk tolerance, and stop loss — instantly see your exact position size, potential profit, and risk/reward ratio.', cat: 'trading tools', color: '#185FA5', icon: '&#9878;', price: 0, type: 'tool', includes: ['Position size calculator', 'Risk/reward ratio', 'Potential profit & loss', 'Max drawdown warning'] },
+  { id: 'niche-scorer', title: 'Niche Profitability Scorer', desc: 'Enter any online niche and get a profitability score from 1-100 based on demand, competition, and monetization potential. Powered by SkillPay\'s market analysis framework.', cat: 'business tools', color: '#1D9E75', icon: '&#128202;', price: 0, pro: true, type: 'tool', includes: ['Profitability score (1-100)', 'Demand vs competition analysis', 'Top monetization methods for that niche', 'Recommended SkillPay course'] },
+  { id: 'income-plan', title: '30-Day Income Action Plan', desc: 'Answer 5 questions about your skills, time, and goals — get a personalized 30-day plan with daily actions to reach your first $100. No two plans are the same.', cat: 'business tools', color: '#C9933A', icon: '&#128640;', price: 0, pro: true, type: 'tool', includes: ['Personalized 30-day plan', 'Daily action items', 'Milestone checkpoints', 'Recommended resources per week'] },
+  { id: 'bio-gen', title: 'Bio & Headline Generator', desc: 'Enter your skill, target audience, and personality — get 5 high-converting bios for Instagram, LinkedIn, Twitter, and TikTok. Each one optimized for clicks.', cat: 'content tools', color: '#993556', icon: '&#127919;', price: 0, type: 'tool', includes: ['5 custom bios generated', 'Platform-specific optimization', 'CTA suggestions', 'Emoji placement guide'] },
+  { id: 'pricing-strat', title: 'Product Pricing Strategizer', desc: 'Enter your digital product details — get recommended pricing with psychological pricing tactics, tier structure, and launch discount strategy.', cat: 'business tools', color: '#0F6E56', icon: '&#128176;', price: 0, pro: true, type: 'tool', includes: ['Recommended price point', '3-tier pricing structure', 'Launch discount strategy', 'Price anchoring framework'] },
+  { id: 'client-red-flags', title: 'Client Red Flag Checker', desc: 'Paste a potential client\'s message or job posting — get a red flag analysis highlighting warning signs and a trust score. Avoid bad clients before you start.', cat: 'freelancing tools', color: '#E24B4A', icon: '&#128680;', price: 0, type: 'tool', includes: ['Red flag analysis', 'Trust score (1-100)', 'Common scam pattern detection', 'Response template if flags found'] },
+  { id: 'content-repurpose', title: 'Content Repurposer', desc: 'Paste one piece of content — get it repurposed into 5 formats: tweet thread, Instagram caption, LinkedIn post, TikTok script, and email newsletter. One input, five outputs.', cat: 'content tools', color: '#993556', icon: '&#9851;', price: 0, pro: true, type: 'tool', includes: ['5 repurposed content pieces', 'Platform-optimized formatting', 'Hashtag sets per platform', 'Posting schedule suggestion'] },
+  { id: 'expense-tracker', title: 'Side Hustle Expense Tracker', desc: 'Track income, expenses, and profit for your side hustle. Auto-calculates tax estimates and shows your real take-home. Built for beginners, not accountants.', cat: 'business tools', color: '#0F6E56', icon: '&#128203;', price: 0, type: 'tool', includes: ['Income & expense logging', 'Auto tax estimate (US)', 'Monthly profit/loss chart', 'Export for tax season'] }
+];
+
+// Tool HTML generators
+var TOOL_BUILDERS = {
+  'email-gen': function() {
+    return '<div class="tool-form">' +
+      '<div class="tool-field"><label>What service do you offer?</label><input type="text" id="tool-service" placeholder="e.g. Logo design, social media management"></div>' +
+      '<div class="tool-field"><label>Who is your ideal client?</label><input type="text" id="tool-client" placeholder="e.g. Small restaurant owners, Shopify store owners"></div>' +
+      '<div class="tool-field"><label>What problem do you solve for them?</label><input type="text" id="tool-problem" placeholder="e.g. They have no online presence, their social media is dead"></div>' +
+      '<div class="tool-field"><label>What makes you different?</label><input type="text" id="tool-diff" placeholder="e.g. I deliver in 48 hours, I have 5 years experience"></div>' +
+      '<button class="tool-generate" onclick="generateEmails()">Generate 3 cold emails</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
+  },
+  'rate-calc': function() {
+    return '<div class="tool-form">' +
+      '<div class="tool-field"><label>Monthly expenses (rent, bills, etc.)</label><input type="number" id="tool-expenses" placeholder="2000"></div>' +
+      '<div class="tool-field"><label>Desired monthly income (after expenses)</label><input type="number" id="tool-income" placeholder="3000"></div>' +
+      '<div class="tool-field"><label>Hours you can work per week</label><input type="number" id="tool-hours" placeholder="20"></div>' +
+      '<div class="tool-field"><label>Your skill area</label><select id="tool-skill"><option>Web design</option><option>Graphic design</option><option>Writing/copywriting</option><option>Social media management</option><option>Video editing</option><option>Development/coding</option><option>Virtual assistant</option><option>Consulting</option><option>Other</option></select></div>' +
+      '<button class="tool-generate" onclick="calculateRate()">Calculate my rate</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
+  },
+  'position-calc': function() {
+    return '<div class="tool-form">' +
+      '<div class="tool-field"><label>Account balance ($)</label><input type="number" id="tool-balance" placeholder="10000"></div>' +
+      '<div class="tool-field"><label>Risk per trade (%)</label><input type="number" id="tool-risk" placeholder="2" step="0.5"></div>' +
+      '<div class="tool-field"><label>Entry price ($)</label><input type="number" id="tool-entry" placeholder="150" step="0.01"></div>' +
+      '<div class="tool-field"><label>Stop loss price ($)</label><input type="number" id="tool-stop" placeholder="145" step="0.01"></div>' +
+      '<div class="tool-field"><label>Take profit price ($)</label><input type="number" id="tool-profit" placeholder="160" step="0.01"></div>' +
+      '<button class="tool-generate" onclick="calculatePosition()">Calculate position</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
+  },
+  'bio-gen': function() {
+    return '<div class="tool-form">' +
+      '<div class="tool-field"><label>What do you do?</label><input type="text" id="tool-do" placeholder="e.g. Graphic designer, Crypto trader, Content creator"></div>' +
+      '<div class="tool-field"><label>Who do you help?</label><input type="text" id="tool-audience" placeholder="e.g. Small businesses, Aspiring traders, Gen Z"></div>' +
+      '<div class="tool-field"><label>Your personality in 3 words</label><input type="text" id="tool-vibe" placeholder="e.g. Bold, funny, real"></div>' +
+      '<div class="tool-field"><label>Platform</label><select id="tool-platform"><option>Instagram</option><option>TikTok</option><option>LinkedIn</option><option>Twitter/X</option></select></div>' +
+      '<button class="tool-generate" onclick="generateBios()">Generate 5 bios</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
+  },
+  'client-red-flags': function() {
+    return '<div class="tool-form">' +
+      '<div class="tool-field"><label>Paste the client message or job posting</label><textarea id="tool-message" rows="6" placeholder="Paste the full message or job description here..."></textarea></div>' +
+      '<button class="tool-generate" onclick="checkRedFlags()">Analyze for red flags</button>' +
+      '<div id="tool-output" class="tool-output"></div></div>';
+  }
+};
+
+// Tool generators
+function generateEmails() {
+  var service = document.getElementById('tool-service').value.trim();
+  var client = document.getElementById('tool-client').value.trim();
+  var problem = document.getElementById('tool-problem').value.trim();
+  var diff = document.getElementById('tool-diff').value.trim();
+  if (!service || !client) { alert('Please fill in at least your service and ideal client.'); return; }
+  var out = document.getElementById('tool-output');
+  out.innerHTML = '<div class="tool-result">' +
+    '<div class="tool-result-title">Email #1 — The Value-First Approach</div>' +
+    '<div class="tool-result-text">Subject: Quick idea for your ' + (problem || 'business') + '\n\nHi there,\n\nI noticed that [specific observation about their business]. I work with ' + client + ' to help them ' + (problem ? 'solve ' + problem : 'grow their business') + '.\n\nI had a quick idea that could help — would you be open to a 5-minute chat this week?\n\n' + (diff ? 'A bit about me: ' + diff + '.' : '') + '\n\nBest,\n[Your name]</div>' +
+    '<button class="tool-copy" onclick="copyToolText(this)">Copy email</button>' +
+    '</div><div class="tool-result">' +
+    '<div class="tool-result-title">Email #2 — The Case Study Approach</div>' +
+    '<div class="tool-result-text">Subject: How I helped a ' + client.split(' ')[0] + ' business [get result]\n\nHi,\n\nI recently helped a ' + client.split(' ')[0] + ' business ' + (problem ? problem.replace(/they/gi, '').trim() : 'grow significantly') + ' using my ' + service + ' services.\n\nI\'d love to do the same for you. Here\'s what I\'m thinking:\n\n1. [Quick win you can offer]\n2. [Medium-term result]\n3. [Long-term transformation]\n\nWould it make sense to connect this week?\n\n' + (diff ? diff + '.' : '') + '\n\n[Your name]</div>' +
+    '<button class="tool-copy" onclick="copyToolText(this)">Copy email</button>' +
+    '</div><div class="tool-result">' +
+    '<div class="tool-result-title">Email #3 — The Direct Approach</div>' +
+    '<div class="tool-result-text">Subject: ' + service + ' for your business\n\nHi,\n\nI\'ll keep this short — I offer ' + service + ' specifically for ' + client + '.\n\n' + (problem ? 'I know ' + problem + ', and I can fix that.' : 'I help businesses like yours get results fast.') + '\n\n' + (diff ? 'Why me? ' + diff + '.' : '') + '\n\nInterested? Just reply "yes" and I\'ll send over some options.\n\n[Your name]</div>' +
+    '<button class="tool-copy" onclick="copyToolText(this)">Copy email</button></div>';
+}
+
+function calculateRate() {
+  var expenses = parseFloat(document.getElementById('tool-expenses').value) || 0;
+  var income = parseFloat(document.getElementById('tool-income').value) || 0;
+  var hours = parseFloat(document.getElementById('tool-hours').value) || 1;
+  var skill = document.getElementById('tool-skill').value;
+  var monthlyNeed = expenses + income;
+  var yearlyNeed = monthlyNeed * 12;
+  var weeklyHours = hours;
+  var yearlyHours = weeklyHours * 48;
+  var hourlyRate = Math.ceil(yearlyNeed / yearlyHours);
+  var projectRate = hourlyRate * 10;
+  var marketRates = {'Web design': [50,150], 'Graphic design': [35,100], 'Writing/copywriting': [40,120], 'Social media management': [30,80], 'Video editing': [40,100], 'Development/coding': [60,200], 'Virtual assistant': [20,50], 'Consulting': [75,250], 'Other': [30,100]};
+  var market = marketRates[skill] || [30,100];
+  var out = document.getElementById('tool-output');
+  out.innerHTML = '<div class="tool-result">' +
+    '<div class="tool-result-title">Your calculated rates</div>' +
+    '<div class="tool-result-grid">' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + hourlyRate + '/hr</div><div class="tool-stat-label">Your hourly rate</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + projectRate + '</div><div class="tool-stat-label">Avg project rate</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + monthlyNeed.toLocaleString() + '/mo</div><div class="tool-stat-label">Monthly target</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + market[0] + '-$' + market[1] + '/hr</div><div class="tool-stat-label">Market rate for ' + skill + '</div></div>' +
+    '</div>' +
+    '<div class="tool-result-text" style="margin-top:12px">' + (hourlyRate < market[0] ? '⚠️ Your rate is below market average. Consider raising it to at least $' + market[0] + '/hr.' : hourlyRate > market[1] ? '🌟 Your rate is above market average — make sure your portfolio justifies premium pricing.' : '✅ Your rate is within market range. You\'re priced competitively!') + '</div></div>';
+}
+
+function calculatePosition() {
+  var balance = parseFloat(document.getElementById('tool-balance').value) || 0;
+  var risk = parseFloat(document.getElementById('tool-risk').value) || 2;
+  var entry = parseFloat(document.getElementById('tool-entry').value) || 0;
+  var stop = parseFloat(document.getElementById('tool-stop').value) || 0;
+  var profit = parseFloat(document.getElementById('tool-profit').value) || 0;
+  if (!balance || !entry || !stop) { alert('Please fill in all fields.'); return; }
+  var riskAmount = balance * (risk / 100);
+  var stopDist = Math.abs(entry - stop);
+  var shares = Math.floor(riskAmount / stopDist);
+  var totalCost = shares * entry;
+  var potentialLoss = shares * stopDist;
+  var potentialGain = profit ? shares * Math.abs(profit - entry) : 0;
+  var rr = potentialGain && potentialLoss ? (potentialGain / potentialLoss).toFixed(1) : 'N/A';
+  var out = document.getElementById('tool-output');
+  out.innerHTML = '<div class="tool-result">' +
+    '<div class="tool-result-title">Position analysis</div>' +
+    '<div class="tool-result-grid">' +
+      '<div class="tool-stat"><div class="tool-stat-val">' + shares + '</div><div class="tool-stat-label">Shares/units to buy</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + riskAmount.toFixed(2) + '</div><div class="tool-stat-label">Max risk (' + risk + '%)</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">$' + totalCost.toFixed(2) + '</div><div class="tool-stat-label">Total position cost</div></div>' +
+      '<div class="tool-stat"><div class="tool-stat-val">' + rr + ':1</div><div class="tool-stat-label">Risk/reward ratio</div></div>' +
+    '</div>' +
+    '<div class="tool-result-text" style="margin-top:12px">Potential loss: <span style="color:#E24B4A">-$' + potentialLoss.toFixed(2) + '</span> | Potential gain: <span style="color:#1D9E75">+$' + potentialGain.toFixed(2) + '</span>' +
+    (parseFloat(rr) < 2 && rr !== 'N/A' ? '\n\n⚠️ Risk/reward below 2:1 — consider widening your take profit or tightening your stop loss.' : parseFloat(rr) >= 3 ? '\n\n🌟 Excellent risk/reward ratio!' : '') + '</div></div>';
+}
+
+function generateBios() {
+  var what = document.getElementById('tool-do').value.trim();
+  var audience = document.getElementById('tool-audience').value.trim();
+  var vibe = document.getElementById('tool-vibe').value.trim();
+  var platform = document.getElementById('tool-platform').value;
+  if (!what) { alert('Please fill in what you do.'); return; }
+  var bios = [
+    what + (audience ? ' for ' + audience : '') + ' 💰\nTurning skills into income\n' + (vibe ? vibe.split(',')[0].trim() + ' takes only 🎯' : 'Results > promises') + '\n⬇️ Start free',
+    'I help ' + (audience || 'people') + ' ' + (what.toLowerCase().includes('design') ? 'look professional' : what.toLowerCase().includes('trad') ? 'grow their portfolio' : 'make money online') + '\n' + what + ' ✨\n' + (vibe ? vibe.split(',').map(function(v){return v.trim()}).join(' · ') : 'Strategy · Execution · Results') + '\n🔗 Free resources below',
+    (vibe ? vibe.split(',')[0].trim().charAt(0).toUpperCase() + vibe.split(',')[0].trim().slice(1) : 'Your go-to') + ' ' + what.toLowerCase() + '\n' + (audience ? '📍 Helping ' + audience : '📍 Making ' + what.toLowerCase() + ' simple') + '\n💡 Tips daily\n⬇️ Check this out',
+    'From zero to ' + what.toLowerCase() + ' 📈\n' + (audience ? 'Building for ' + audience : 'Sharing the journey') + '\n' + (vibe ? '🎯 ' + vibe : '🎯 Learn · Build · Earn') + '\nFree guide ⬇️',
+    what + ' | ' + (audience || 'Online business') + '\n' + (platform === 'LinkedIn' ? 'Sharing insights on ' + what.toLowerCase() + ' and growth.' : '🔥 Daily ' + what.toLowerCase() + ' tips') + '\n' + (vibe ? vibe.split(',').map(function(v){return '#'+v.trim().replace(/\s/g,'')}).join(' ') : '#entrepreneur #growth') + '\n⬇️ Link'
+  ];
+  var out = document.getElementById('tool-output');
+  out.innerHTML = bios.map(function(b, i) {
+    return '<div class="tool-result"><div class="tool-result-title">Bio #' + (i+1) + ' — ' + platform + '</div><div class="tool-result-text">' + b + '</div><button class="tool-copy" onclick="copyToolText(this)">Copy bio</button></div>';
+  }).join('');
+}
+
+function checkRedFlags() {
+  var msg = document.getElementById('tool-message').value.trim().toLowerCase();
+  if (!msg) { alert('Please paste a client message or job posting.'); return; }
+  var flags = [];
+  var score = 100;
+  if (msg.includes('exposure') || msg.includes('for free') || msg.includes('no budget')) { flags.push({flag: '🚩 Expects free work', detail: 'Mentions working for "exposure" or has no budget. Your time has value.', severity: 25}); }
+  if (msg.includes('asap') || msg.includes('urgent') || msg.includes('need it today') || msg.includes('rush')) { flags.push({flag: '🚩 Unrealistic deadline', detail: 'Rushing you is a sign of poor planning. Rush = higher rate, always.', severity: 15}); }
+  if (msg.includes('simple') || msg.includes('easy') || msg.includes('quick job') || msg.includes('shouldn\'t take long')) { flags.push({flag: '🚩 Downplays complexity', detail: 'Calling work "simple" or "easy" usually means they\'ll expect more than they\'re paying for.', severity: 15}); }
+  if (msg.includes('test') || msg.includes('trial') || msg.includes('prove yourself')) { flags.push({flag: '🚩 Asks for unpaid trial', detail: 'Legitimate clients don\'t ask for free test work. Offer a paid trial instead.', severity: 20}); }
+  if (!msg.includes('$') && !msg.includes('budget') && !msg.includes('rate') && !msg.includes('pay') && !msg.includes('compensation')) { flags.push({flag: '⚠️ No budget mentioned', detail: 'No discussion of payment could mean they\'re fishing for the cheapest option.', severity: 10}); }
+  if (msg.includes('many revisions') || msg.includes('unlimited revision') || msg.includes('until perfect')) { flags.push({flag: '🚩 Unlimited revisions expected', detail: 'Always cap revisions in your contract (2-3 rounds is standard).', severity: 20}); }
+  if (msg.length < 50) { flags.push({flag: '⚠️ Vague or low-effort message', detail: 'Short, vague messages often mean the client hasn\'t thought through what they need.', severity: 10}); }
+  if (msg.includes('competitor') || msg.includes('copy') || msg.includes('replicate') || msg.includes('just like')) { flags.push({flag: '⚠️ Wants to copy someone else', detail: 'Copying competitors can lead to IP issues and usually means no creative freedom.', severity: 10}); }
+  flags.forEach(function(f) { score -= f.severity; });
+  score = Math.max(score, 0);
+  var color = score >= 70 ? '#1D9E75' : score >= 40 ? '#C9933A' : '#E24B4A';
+  var verdict = score >= 70 ? 'Looks safe — proceed with normal precautions.' : score >= 40 ? 'Some concerns — proceed carefully and set clear boundaries.' : 'High risk — consider declining or requiring upfront payment.';
+  var out = document.getElementById('tool-output');
+  out.innerHTML = '<div class="tool-result">' +
+    '<div class="tool-result-title">Red Flag Analysis</div>' +
+    '<div class="tool-result-grid"><div class="tool-stat"><div class="tool-stat-val" style="color:' + color + '">' + score + '/100</div><div class="tool-stat-label">Trust score</div></div></div>' +
+    '<div class="tool-result-text" style="margin-top:12px">' + verdict + '</div>' +
+    (flags.length > 0 ? flags.map(function(f) { return '<div style="padding:10px 0;border-bottom:1px solid var(--border)"><strong>' + f.flag + '</strong><br><span style="font-size:12px;color:var(--muted)">' + f.detail + '</span></div>'; }).join('') : '<div style="padding:10px 0;color:#1D9E75">✅ No red flags detected! This looks like a legitimate opportunity.</div>') +
+    '</div>';
+}
+
+function copyToolText(btn) {
+  var text = btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied!';
+    btn.style.background = '#1D9E75';
+    setTimeout(function() { btn.textContent = 'Copy'; btn.style.background = ''; }, 1500);
+  });
+}
+
+function renderResources(filter) {
+  var grid = document.getElementById('resource-grid');
+  var owned = getOwned();
+  var isPro = checkProStatus();
+  var filtered = RESOURCES.filter(function(r) {
+    if (!filter || filter === 'all') return true;
+    if (filter === 'free') return r.price === 0 && !r.pro;
+    return r.cat.indexOf(filter) !== -1;
+  });
+
+  grid.innerHTML = filtered.map(function(r) {
+    var isOwned = owned.indexOf(r.id) !== -1;
+    var isFree = r.price === 0 && !r.pro;
+    var isProTool = r.pro === true;
+    var isTool = r.type === 'tool';
+    var canAccess = isFree || isPro || isOwned;
+    
+    var thumbLabel = isProTool ? 'pro' : (isTool ? 'tool' : (isFree ? 'free' : 'paid'));
+    var thumbText = isProTool ? 'Pro only' : (isFree ? 'Free tool' : 'Tool');
+    
+    var btnClass = canAccess ? 'download' : 'pro-only';
+    var btnText = canAccess ? 'Launch tool' : 'Upgrade to Pro';
+
+    return '<div class="resource-card" data-cat="' + r.cat + '">' +
+      '<div class="resource-thumb" style="background:linear-gradient(135deg,' + r.color + ',' + r.color + '88)">' +
+        '<div class="resource-thumb-icon">' + r.icon + '</div>' +
+        '<div class="resource-thumb-label ' + thumbLabel + '">' + thumbText + '</div>' +
+      '</div>' +
+      '<div class="resource-body">' +
+        '<div class="resource-cat" style="color:' + r.color + '">' + (isTool ? '&#9889; Interactive tool' : r.cat.split(' ')[0]) + '</div>' +
+        '<div class="resource-title">' + r.title + '</div>' +
+        '<div class="resource-desc">' + r.desc + '</div>' +
+        '<div class="resource-footer">' +
+          '<div class="resource-price ' + (isFree ? 'free' : '') + '">' + (isProTool ? 'Pro' : 'Free') + '</div>' +
+          '<button class="resource-btn ' + btnClass + '" onclick="event.stopPropagation();openResource(\'' + r.id + '\')">' + btnText + '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('rs-total').textContent = RESOURCES.length;
+  document.getElementById('rs-free').textContent = RESOURCES.filter(function(r){return r.price===0 && !r.pro}).length;
+  document.getElementById('rs-owned').textContent = owned.length + (isPro ? RESOURCES.filter(function(r){return r.pro}).length : 0);
+}
+
+function checkProStatus() {
+  // Check if user has Pro plan (you can integrate with Stripe later)
+  // For now, check localStorage
+  var plan = localStorage.getItem('skillpay_plan') || 'free';
+  return plan === 'pro';
+}
+
+function filterResources(cat, btn) {
+  document.querySelectorAll('.sf-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderResources(cat);
+}
+
+function openResource(id) {
+  var r = RESOURCES.find(function(x) { return x.id === id; });
+  if (!r) return;
+  var owned = getOwned();
+  var isOwned = owned.indexOf(r.id) !== -1;
+  var isFree = r.price === 0 && !r.pro;
+  var isProTool = r.pro === true;
+  var isTool = r.type === 'tool';
+  var isPro = checkProStatus();
+  var canAccess = isFree || isPro || isOwned;
+
+  document.getElementById('pm-title').textContent = r.title;
+  document.getElementById('pm-cat').textContent = isTool ? '⚡ Interactive tool' : r.cat.split(' ')[0];
+  document.getElementById('pm-cat').style.color = r.color;
+
+  if (isTool && canAccess) {
+    // Show the interactive tool
+    var builder = TOOL_BUILDERS[r.id];
+    if (builder) {
+      document.getElementById('pm-desc').innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:16px">' + r.desc + '</div>' + builder();
+      document.getElementById('pm-includes').innerHTML = '';
+      document.getElementById('pm-price').style.display = 'none';
+      document.getElementById('pm-btn').style.display = 'none';
+    } else {
+      document.getElementById('pm-desc').textContent = r.desc;
+      showResourceIncludes(r, canAccess, isProTool);
+    }
+  } else if (isProTool && !isPro) {
+    // Show Pro upgrade prompt
+    document.getElementById('pm-desc').textContent = r.desc;
+    var includesHTML = '<h4>What\'s included:</h4>';
+    r.includes.forEach(function(item) {
+      includesHTML += '<div class="pmi-item"><div class="pmi-icon">&#10003;</div>' + item + '</div>';
+    });
+    includesHTML += '<div style="margin-top:16px;padding:14px;background:rgba(201,147,58,0.08);border-radius:10px;border:1px solid rgba(201,147,58,0.2)"><div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:4px">🌟 Pro exclusive</div><div style="font-size:12px;color:var(--muted);line-height:1.6">This tool is available with a Pro subscription. Unlock all 6 premium tools + 8 advanced courses for $10.99/month.</div></div>';
+    document.getElementById('pm-includes').innerHTML = includesHTML;
+    
+    var priceEl = document.getElementById('pm-price');
+    var btnEl = document.getElementById('pm-btn');
+    priceEl.style.display = '';
+    btnEl.style.display = '';
+    priceEl.textContent = 'Pro only';
+    priceEl.className = 'preview-modal-price';
+    priceEl.style.color = 'var(--gold)';
+    btnEl.textContent = 'Upgrade to Pro — $10.99/mo';
+    btnEl.className = 'preview-modal-btn pro-only';
+    btnEl.onclick = function() { 
+      window.location.href = 'skillpay-account.html?upgrade=pro';
+    };
+  } else {
+    document.getElementById('pm-desc').textContent = r.desc;
+    showResourceIncludes(r, canAccess, isProTool);
+  }
+
+  document.getElementById('preview-overlay').classList.add('show');
+}
+
+function showResourceIncludes(r, canAccess, isProTool) {
+  var includesHTML = '<h4>What\'s included:</h4>';
+  r.includes.forEach(function(item) {
+    includesHTML += '<div class="pmi-item"><div class="pmi-icon">&#10003;</div>' + item + '</div>';
+  });
+  document.getElementById('pm-includes').innerHTML = includesHTML;
+
+  var priceEl = document.getElementById('pm-price');
+  var btnEl = document.getElementById('pm-btn');
+  priceEl.style.display = '';
+  btnEl.style.display = '';
+
+  if (canAccess) {
+    priceEl.textContent = isProTool ? 'Pro' : 'Free';
+    priceEl.className = 'preview-modal-price free';
+    btnEl.textContent = r.type === 'tool' ? 'Launch tool' : 'Download';
+    btnEl.className = 'preview-modal-btn download';
+    btnEl.onclick = function() { if (r.type === 'tool') { openResource(r.id); } else { claimResource(r); } };
+  } else {
+    priceEl.textContent = 'Pro only';
+    priceEl.className = 'preview-modal-price';
+    priceEl.style.color = 'var(--gold)';
+    btnEl.textContent = 'Upgrade to Pro';
+    btnEl.className = 'preview-modal-btn pro-only';
+    btnEl.onclick = function() { window.location.href = 'skillpay-account.html?upgrade=pro'; };
+  }
+}
+
+function closePreview() {
+  document.getElementById('preview-overlay').classList.remove('show');
+}
+
+function getOwned() {
+  try { return JSON.parse(localStorage.getItem('skillpay_owned_resources') || '[]'); } catch(e) { return []; }
+}
+
+function claimResource(r) {
+  var owned = getOwned();
+  if (owned.indexOf(r.id) === -1) {
+    owned.push(r.id);
+    localStorage.setItem('skillpay_owned_resources', JSON.stringify(owned));
+  }
+  closePreview();
+  renderResources('all');
+}
+
+function downloadResource(r) {
+  alert('Resource: ' + r.title + '\n\nIn production, this would download the actual file. For now, the resource is marked as owned in your account.');
+}
+
+// Theme
+(function(){
+  var t = localStorage.getItem('skillpay_theme');
+  if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+
+// Mobile menu
+function toggleMobileMenu(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+
+// Init
+renderResources('all');
+</script>
+
+</body>
+</html>
