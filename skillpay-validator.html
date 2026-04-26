@@ -921,8 +921,8 @@ footer p {
 // CONFIG — paste your free Gemini key here
 // Get it free: aistudio.google.com → Get API Key
 // ===========================
-const GEMINI_KEY = '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';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+const OPENROUTER_KEY = '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';
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // State
 const selections = { time: null, budget: null, skills: [] };
@@ -1014,17 +1014,23 @@ Return ONLY valid JSON, no markdown, no backticks, exactly this structure:
 }`;
 
   try {
-    const res = await fetch(GEMINI_URL, {
+    const res = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_KEY}`,
+        'HTTP-Referer': 'https://skillpay.app',
+        'X-Title': 'SkillPay'
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
+        model: 'mistralai/mistral-7b-instruct:free',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1200
       })
     });
 
     const data = await res.json();
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let raw = data.choices?.[0]?.message?.content || '';
 
     // Strip any markdown backticks
     raw = raw.replace(/```json|```/g, '').trim();
