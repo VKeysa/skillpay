@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Business Idea Validator — SkillPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root {
+  --black: #060608;
+  --white: #f2f0eb;
+  --cream: #e8e4dc;
+  --gold: #c9933a;
+  --gold-light: #e8b86d;
+  --gold-dim: rgba(201,147,58,0.12);
+  --gold-glow: rgba(201,147,58,0.35);
+  --surface: #0d0d10;
+  --surface2: #131318;
+  --border: rgba(201,147,58,0.18);
+  --muted: #5a5860;
+  --text: #ccc8c0;
+  --red: #e05252;
+  --green: #52c07a;
+  --blue: #5299e0;
+  --mono: 'DM Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --body: 'DM Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:999;
+  opacity:0.5;
+}
+
+/* Ambient glow */
+.ambient {
+  position:fixed;
+  top:-20%;left:50%;
+  transform:translateX(-50%);
+  width:800px;height:400px;
+  background:radial-gradient(ellipse, rgba(201,147,58,0.08) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ===== HERO ===== */
+.hero {
+  position:relative;
+  z-index:1;
+  padding: 60px 24px 48px;
+  text-align:center;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.brand {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:48px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:3px;
+  color:var(--gold);
+  text-transform:uppercase;
+}
+
+.brand-dot {
+  width:6px;height:6px;
+  background:var(--gold);
+  border-radius:50%;
+  animation: brandpulse 2s ease-in-out infinite;
+}
+
+@keyframes brandpulse {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.7)}
+}
+
+.hero-label {
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--gold);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+
+.hero-label::before,.hero-label::after {
+  content:'';
+  width:40px;height:1px;
+  background:var(--border);
+}
+
+h1 {
+  font-family:var(--display);
+  font-size:clamp(56px, 10vw, 110px);
+  line-height:0.92;
+  color:var(--white);
+  letter-spacing:2px;
+  margin-bottom:24px;
+}
+
+h1 span {
+  color:var(--gold);
+  display:block;
+}
+
+.hero-sub {
+  font-size:17px;
+  color:var(--muted);
+  max-width:500px;
+  margin:0 auto 48px;
+  line-height:1.7;
+  font-weight:300;
+}
+
+.hero-sub strong { color:var(--text); font-weight:500; }
+
+.scroll-hint {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  animation: bounceY 2s ease-in-out infinite;
+}
+
+@keyframes bounceY {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(6px)}
+}
+
+/* ===== FORM ===== */
+.form-section {
+  position:relative;
+  z-index:1;
+  max-width:760px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+
+.form-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  overflow:hidden;
+  position:relative;
+}
+
+.form-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.form-header {
+  padding:36px 40px 0;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:32px;
+}
+
+.form-num {
+  font-family:var(--display);
+  font-size:48px;
+  color:var(--gold);
+  line-height:1;
+  opacity:0.3;
+}
+
+.form-header-text {}
+.form-header-text h3 {
+  font-size:20px;
+  font-weight:700;
+  color:var(--white);
+  margin-bottom:4px;
+}
+
+.form-header-text p {
+  font-size:13px;
+  color:var(--muted);
+}
+
+.form-body { padding:0 40px 40px; }
+
+.field {
+  margin-bottom:24px;
+}
+
+.field label {
+  display:block;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--gold);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.field textarea, .field input {
+  width:100%;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;
+  padding:16px 20px;
+  color:var(--white);
+  font-family:var(--body);
+  font-size:15px;
+  outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+  resize:none;
+  line-height:1.6;
+}
+
+.field textarea:focus, .field input:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(201,147,58,0.1);
+}
+
+.field textarea::placeholder, .field input::placeholder {
+  color:var(--muted);
+}
+
+.field textarea { min-height:100px; }
+
+.chips {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.chip {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:100px;
+  padding:8px 18px;
+  color:var(--text);
+  font-family:var(--body);
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.chip:hover { border-color:var(--gold); color:var(--gold-light); }
+
+.chip.selected {
+  background:var(--gold-dim);
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+.validate-btn {
+  width:100%;
+  background:var(--gold);
+  color:var(--black);
+  border:none;
+  border-radius:14px;
+  padding:20px;
+  font-family:var(--display);
+  font-size:22px;
+  letter-spacing:2px;
+  cursor:pointer;
+  transition:all 0.25s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-top:8px;
+}
+
+.validate-btn:hover {
+  background:var(--gold-light);
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(201,147,58,0.4);
+}
+
+.validate-btn:disabled {
+  opacity:0.4;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+/* ===== LOADING ===== */
+#loading {
+  display:none;
+  text-align:center;
+  padding:60px 40px;
+}
+
+.loading-bars {
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:6px;
+  height:48px;
+  margin-bottom:24px;
+}
+
+.loading-bar {
+  width:4px;
+  background:var(--gold);
+  border-radius:2px;
+  animation:barwave 1.2s ease-in-out infinite;
+}
+
+.loading-bar:nth-child(1){height:20px;animation-delay:0s}
+.loading-bar:nth-child(2){height:35px;animation-delay:0.1s}
+.loading-bar:nth-child(3){height:48px;animation-delay:0.2s}
+.loading-bar:nth-child(4){height:35px;animation-delay:0.3s}
+.loading-bar:nth-child(5){height:20px;animation-delay:0.4s}
+
+@keyframes barwave {
+  0%,100%{transform:scaleY(0.5);opacity:0.5}
+  50%{transform:scaleY(1);opacity:1}
+}
+
+.loading-text {
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--gold);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.loading-sub {
+  font-size:13px;
+  color:var(--muted);
+  font-style:italic;
+}
+
+/* ===== RESULTS ===== */
+#results {
+  display:none;
+  animation:fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.results-header {
+  padding:36px 40px 28px;
+  border-bottom:1px solid var(--border);
+}
+
+.idea-submitted {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.idea-name {
+  font-family:var(--display);
+  font-size:36px;
+  color:var(--white);
+  letter-spacing:1px;
+  line-height:1.1;
+}
+
+/* Score gauge */
+.score-section {
+  padding:36px 40px;
+  border-bottom:1px solid var(--border);
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:40px;
+  align-items:center;
+}
+
+.score-gauge {
+  position:relative;
+  width:180px;height:180px;
+}
+
+.score-gauge svg { width:100%;height:100%; }
+
+.score-center {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.score-num {
+  font-family:var(--display);
+  font-size:56px;
+  color:var(--white);
+  line-height:1;
+}
+
+.score-label {
+  font-family:var(--mono);
+  font-size:9px;
+  color:var(--muted);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+.score-verdict {
+  font-family:var(--display);
+  font-size:32px;
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+
+.score-verdict.excellent { color:var(--green); }
+.score-verdict.good { color:var(--gold-light); }
+.score-verdict.risky { color:#e0a052; }
+.score-verdict.poor { color:var(--red); }
+
+.score-summary {
+  font-size:14px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* Metrics grid */
+.metrics-grid {
+  padding:32px 40px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  border-bottom:1px solid var(--border);
+}
+
+.metric-card {
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:14px;
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.metric-card::before {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+}
+
+.metric-card.positive::before { background:var(--green); }
+.metric-card.neutral::before { background:var(--gold); }
+.metric-card.negative::before { background:var(--red); }
+
+.metric-icon { font-size:22px; margin-bottom:10px; }
+.metric-label {
+  font-family:var(--mono);
+  font-size:9px;
+  color:var(--muted);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+
+.metric-value {
+  font-size:15px;
+  font-weight:700;
+  color:var(--white);
+  margin-bottom:4px;
+}
+
+.metric-sub { font-size:11px; color:var(--muted); line-height:1.4; }
+
+/* Analysis sections */
+.analysis-body {
+  padding:32px 40px;
+  border-bottom:1px solid var(--border);
+}
+
+.analysis-block {
+  margin-bottom:28px;
+}
+
+.analysis-block:last-child { margin-bottom:0; }
+
+.analysis-label {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--gold);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.analysis-label::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.analysis-text {
+  font-size:14px;
+  line-height:1.85;
+  color:var(--text);
+  white-space:pre-wrap;
+}
+
+.analysis-text strong { color:var(--gold-light); font-weight:600; }
+
+/* Courses CTA */
+.courses-cta {
+  padding:36px 40px;
+  background:linear-gradient(135deg, rgba(201,147,58,0.08), transparent);
+  border-bottom:1px solid var(--border);
+}
+
+.cta-label {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--gold);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+
+.cta-title {
+  font-family:var(--display);
+  font-size:30px;
+  color:var(--white);
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+
+.cta-sub {
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:24px;
+}
+
+.course-pills {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:28px;
+}
+
+.course-pill {
+  background:var(--gold-dim);
+  border:1px solid var(--border);
+  border-radius:100px;
+  padding:8px 16px;
+  font-size:12px;
+  color:var(--gold-light);
+  font-weight:500;
+}
+
+.course-pill::before { content:'📚 '; }
+
+.cta-buttons {
+  display:flex;
+  gap:12px;
+}
+
+.cta-primary {
+  background:var(--gold);
+  color:var(--black);
+  border:none;
+  border-radius:10px;
+  padding:14px 28px;
+  font-family:var(--display);
+  font-size:18px;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.cta-primary:hover {
+  background:var(--gold-light);
+  transform:translateY(-1px);
+  box-shadow:0 8px 28px rgba(201,147,58,0.4);
+}
+
+.cta-secondary {
+  background:transparent;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px;
+  padding:14px 28px;
+  font-family:var(--body);
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+}
+
+.cta-secondary:hover { border-color:var(--gold); color:var(--gold-light); }
+
+/* Try again */
+.try-again {
+  padding:24px 40px;
+  text-align:center;
+}
+
+.try-again button {
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 24px;
+  color:var(--muted);
+  font-family:var(--body);
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.try-again button:hover { border-color:var(--gold); color:var(--gold); }
+
+/* ===== SOCIAL PROOF ===== */
+.proof-section {
+  position:relative;
+  z-index:1;
+  max-width:760px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+
+.proof-title {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.proof-cards {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+}
+
+.proof-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+}
+
+.proof-score {
+  font-family:var(--display);
+  font-size:42px;
+  color:var(--gold);
+  line-height:1;
+  margin-bottom:4px;
+}
+
+.proof-idea { font-size:13px; color:var(--text); font-weight:500; margin-bottom:8px; }
+.proof-verdict { font-size:11px; color:var(--muted); }
+
+/* ===== FOOTER ===== */
+footer {
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:40px 24px;
+  border-top:1px solid var(--border);
+}
+
+.footer-brand {
+  font-family:var(--display);
+  font-size:28px;
+  color:var(--white);
+  letter-spacing:2px;
+  margin-bottom:8px;
+}
+
+.footer-brand span { color:var(--gold); }
+
+footer p {
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* Mobile */
+@media(max-width:640px) {
+  h1 { font-size:52px; }
+  .form-header, .form-body, .score-section, .metrics-grid, .analysis-body, .courses-cta, .try-again { padding-left:24px; padding-right:24px; }
+  .score-section { grid-template-columns:1fr; text-align:center; }
+  .score-gauge { margin:0 auto; }
+  .metrics-grid { grid-template-columns:1fr 1fr; }
+  .proof-cards { grid-template-columns:1fr; }
+  .cta-buttons { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    SkillPay — Free Tool
+    <div class="brand-dot"></div>
+  </div>
+
+  <div class="hero-label">AI-Powered Analysis</div>
+
+  <h1>Rate Your<span>Business Idea.</span></h1>
+
+  <p class="hero-sub">
+    Type in any business idea and get a <strong>brutally honest AI report</strong> — viability score, market size, biggest risks, and the exact roadmap to your first dollar.
+  </p>
+
+  <div class="scroll-hint">↓ &nbsp; Start Below &nbsp; ↓</div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-card">
+
+    <!-- Input form -->
+    <div id="form-view">
+      <div class="form-header">
+        <div class="form-num">01</div>
+        <div class="form-header-text">
+          <h3>Describe your business idea</h3>
+          <p>Be as specific as possible — vague ideas get vague results.</p>
+        </div>
+      </div>
+      <div class="form-body">
+        <div class="field">
+          <label>Your idea</label>
+          <textarea id="idea-input" placeholder="e.g. A Shopify dropshipping store selling posture correction products to office workers, marketed through TikTok and Instagram reels..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Your available time per week</label>
+          <div class="chips" id="time-chips">
+            <button class="chip" onclick="selectChip(this,'time','5hrs')">Under 5 hrs</button>
+            <button class="chip" onclick="selectChip(this,'time','10hrs')">5–10 hrs</button>
+            <button class="chip" onclick="selectChip(this,'time','20hrs')">10–20 hrs</button>
+            <button class="chip" onclick="selectChip(this,'time','fulltime')">Full-time</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Your current skills</label>
+          <div class="chips" id="skill-chips">
+            <button class="chip" onclick="toggleChipMulti(this,'skill','writing')">Writing</button>
+            <button class="chip" onclick="toggleChipMulti(this,'skill','design')">Design</button>
+            <button class="chip" onclick="toggleChipMulti(this,'skill','tech')">Tech/Coding</button>
+            <button class="chip" onclick="toggleChipMulti(this,'skill','marketing')">Marketing</button>
+            <button class="chip" onclick="toggleChipMulti(this,'skill','sales')">Sales</button>
+            <button class="chip" onclick="toggleChipMulti(this,'skill','none')">None yet</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Starting budget</label>
+          <div class="chips" id="budget-chips">
+            <button class="chip" onclick="selectChip(this,'budget','zero')">$0 — Bootstrapped</button>
+            <button class="chip" onclick="selectChip(this,'budget','low')">$100–500</button>
+            <button class="chip" onclick="selectChip(this,'budget','mid')">$500–2K</button>
+            <button class="chip" onclick="selectChip(this,'budget','high')">$2K+</button>
+          </div>
+        </div>
+
+        <button class="validate-btn" id="validate-btn" onclick="validateIdea()">
+          ⚡ VALIDATE MY IDEA
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading">
+      <div class="loading-bars">
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar"></div>
+      </div>
+      <div class="loading-text">Analyzing your idea</div>
+      <div class="loading-sub" id="loading-msg">Running market viability checks...</div>
+    </div>
+
+    <!-- Results -->
+    <div id="results">
+      <div class="results-header">
+        <div class="idea-submitted">Your idea</div>
+        <div class="idea-name" id="result-idea-name">—</div>
+      </div>
+
+      <!-- Score -->
+      <div class="score-section">
+        <div class="score-gauge">
+          <svg viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="75" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+            <circle id="score-ring" cx="90" cy="90" r="75" fill="none"
+              stroke="var(--gold)" stroke-width="10"
+              stroke-linecap="round"
+              stroke-dasharray="471"
+              stroke-dashoffset="471"
+              transform="rotate(-90 90 90)"
+              style="transition:stroke-dashoffset 1.5s ease, stroke 0.5s"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-num" id="score-display">0</div>
+            <div class="score-label">Viability</div>
+          </div>
+        </div>
+        <div>
+          <div class="score-verdict" id="score-verdict">—</div>
+          <div class="score-summary" id="score-summary">—</div>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid" id="metrics-grid">
+        <!-- JS generated -->
+      </div>
+
+      <!-- Analysis -->
+      <div class="analysis-body" id="analysis-body">
+        <!-- JS generated -->
+      </div>
+
+      <!-- Courses CTA -->
+      <div class="courses-cta">
+        <div class="cta-label">Your SkillPay Roadmap</div>
+        <div class="cta-title">Courses that execute this idea</div>
+        <div class="cta-sub">These SkillPay courses give you the exact skills to turn this idea into income.</div>
+        <div class="course-pills" id="course-pills"></div>
+        <div class="cta-buttons">
+          <a href="skillpay-dashboard.html" class="cta-primary">Start Learning Free →</a>
+          <a href="skillpay-dashboard.html" class="cta-secondary">View all courses</a>
+        </div>
+      </div>
+
+      <!-- Try again -->
+      <div class="try-again">
+        <button onclick="resetForm()">← Validate a different idea</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Social proof -->
+<section class="proof-section">
+  <div class="proof-title">Recent validations</div>
+  <div class="proof-cards">
+    <div class="proof-card">
+      <div class="proof-score">74</div>
+      <div class="proof-idea">Print-on-demand Etsy store</div>
+      <div class="proof-verdict">✅ Strong idea — low risk, proven market</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-score">88</div>
+      <div class="proof-idea">LinkedIn ghostwriting service</div>
+      <div class="proof-verdict">🔥 Excellent — high demand, low competition</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-score">61</div>
+      <div class="proof-idea">General dropshipping store</div>
+      <div class="proof-verdict">⚠️ Risky — needs stronger niche</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-brand">Skill<span>Pay</span></div>
+  <p>Free business idea validation powered by AI · No signup required</p>
+</footer>
+
+<script>
+// ===========================
+// CONFIG — paste your free Gemini key here
+// Get it free: aistudio.google.com → Get API Key
+// ===========================
+const GEMINI_KEY = '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';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+
+// State
+const selections = { time: null, budget: null, skills: [] };
+
+function selectChip(el, field, val) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[field] = val;
+}
+
+function toggleChipMulti(el, field, val) {
+  if (val === 'none') {
+    selections.skills = ['none'];
+    document.getElementById('skill-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    return;
+  }
+  const noneChip = [...document.getElementById('skill-chips').querySelectorAll('.chip')].find(c => c.textContent === 'None yet');
+  if (noneChip) noneChip.classList.remove('selected');
+  selections.skills = selections.skills.filter(s => s !== 'none');
+
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    selections.skills = selections.skills.filter(s => s !== val);
+  } else {
+    el.classList.add('selected');
+    selections.skills.push(val);
+  }
+}
+
+async function validateIdea() {
+  const idea = document.getElementById('idea-input').value.trim();
+  if (!idea || idea.length < 15) {
+    alert('Please describe your idea in a bit more detail!');
+    return;
+  }
+
+  document.getElementById('form-view').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+
+  const msgs = [
+    'Running market viability checks...',
+    'Analyzing competition levels...',
+    'Calculating time-to-first-dollar...',
+    'Identifying risks and opportunities...',
+    'Matching SkillPay courses...',
+    'Building your report...'
+  ];
+
+  let i = 0;
+  const msgInterval = setInterval(() => {
+    if (i < msgs.length) {
+      document.getElementById('loading-msg').textContent = msgs[i++];
+    }
+  }, 800);
+
+  const timeLabel = { '5hrs': 'under 5 hours/week', '10hrs': '5-10 hours/week', '20hrs': '10-20 hours/week', 'fulltime': 'full-time' };
+  const budgetLabel = { 'zero': '$0 bootstrapped', 'low': '$100-500', 'mid': '$500-2,000', 'high': '$2,000+' };
+
+  const prompt = `You are an elite startup and business idea validator. Analyze this business idea and return a structured JSON report.
+
+IDEA: "${idea}"
+AVAILABLE TIME: ${timeLabel[selections.time] || 'not specified'}
+SKILLS: ${selections.skills.length ? selections.skills.join(', ') : 'not specified'}
+STARTING BUDGET: ${budgetLabel[selections.budget] || 'not specified'}
+
+SKILLPAY COURSES AVAILABLE (only recommend from this list):
+Make Your First $100 Online, Land Your First Freelance Client, Grow to 1000 Followers Fast, Sell Your First Digital Product, Master Affiliate Marketing, Start a Profitable Side Hustle, SEO & Content Marketing, Email Marketing That Converts, Personal Branding on LinkedIn, Instagram Growth Strategy, TikTok Creator Playbook, Launch Your First Online Course, Build an AI-Powered Business, Dropshipping Step-by-Step, Day Trading for Beginners, Crypto Trading Fundamentals, Options Trading Basics
+
+Return ONLY valid JSON, no markdown, no backticks, exactly this structure:
+{
+  "score": <number 0-100>,
+  "verdict": "<one of: EXCELLENT, GOOD, RISKY, POOR>",
+  "summary": "<2-3 sentence honest assessment of the idea overall>",
+  "metrics": [
+    {"icon": "📊", "label": "Market Size", "value": "<small/medium/large/massive>", "detail": "<one line>", "tone": "<positive/neutral/negative>"},
+    {"icon": "⚔️", "label": "Competition", "value": "<low/medium/high/extreme>", "detail": "<one line>", "tone": "<positive/neutral/negative>"},
+    {"icon": "⏱️", "label": "Time to $1", "value": "<e.g. 2-4 weeks>", "detail": "<one line>", "tone": "<positive/neutral/negative>"},
+    {"icon": "💰", "label": "Income Potential", "value": "<e.g. $500-2K/mo>", "detail": "<one line>", "tone": "<positive/neutral/negative>"},
+    {"icon": "🎯", "label": "Skill Match", "value": "<poor/fair/good/perfect>", "detail": "<one line>", "tone": "<positive/neutral/negative>"},
+    {"icon": "⚡", "label": "Startup Speed", "value": "<slow/moderate/fast/instant>", "detail": "<one line>", "tone": "<positive/neutral/negative>"}
+  ],
+  "strengths": "<2-3 specific strengths of this idea, use \\n between points>",
+  "risks": "<2-3 specific risks that could kill this idea, use \\n between points>",
+  "criticalPath": "<Exact 3-step sequence to go from idea to first dollar, numbered, use \\n between steps>",
+  "verdict_detail": "<One brutal, honest paragraph about whether to pursue, tweak, or kill this idea>",
+  "courses": ["<course name 1>", "<course name 2>", "<course name 3>"]
+}`;
+
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
+      })
+    });
+
+    const data = await res.json();
+    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Strip any markdown backticks
+    raw = raw.replace(/```json|```/g, '').trim();
+
+    clearInterval(msgInterval);
+
+    let report;
+    try {
+      report = JSON.parse(raw);
+    } catch(e) {
+      // Try to extract JSON from response
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) report = JSON.parse(match[0]);
+      else throw new Error('Could not parse response');
+    }
+
+    renderResults(idea, report);
+
+  } catch(e) {
+    clearInterval(msgInterval);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-view').style.display = 'block';
+    alert('Error getting analysis. Make sure your Gemini API key is set at the top of the file, then try again.');
+    console.error(e);
+  }
+}
+
+function renderResults(idea, r) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  // Idea name
+  const shortIdea = idea.length > 80 ? idea.substring(0, 80) + '...' : idea;
+  document.getElementById('result-idea-name').textContent = shortIdea;
+
+  // Score animation
+  const score = Math.min(100, Math.max(0, r.score || 50));
+  const circumference = 471;
+  const offset = circumference - (score / 100) * circumference;
+
+  const ring = document.getElementById('score-ring');
+  const colors = { EXCELLENT: '#52c07a', GOOD: '#c9933a', RISKY: '#e0a052', POOR: '#e05252' };
+  ring.style.stroke = colors[r.verdict] || 'var(--gold)';
+
+  let count = 0;
+  const counter = setInterval(() => {
+    count = Math.min(count + 2, score);
+    document.getElementById('score-display').textContent = count;
+    if (count >= score) clearInterval(counter);
+  }, 20);
+
+  setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+
+  // Verdict
+  const verdictEl = document.getElementById('score-verdict');
+  verdictEl.textContent = r.verdict || 'GOOD';
+  verdictEl.className = 'score-verdict ' + (r.verdict || 'good').toLowerCase();
+  document.getElementById('score-summary').textContent = r.summary || '';
+
+  // Metrics
+  const toneClass = { positive: 'positive', neutral: 'neutral', negative: 'negative' };
+  document.getElementById('metrics-grid').innerHTML = (r.metrics || []).map(m => `
+    <div class="metric-card ${toneClass[m.tone] || 'neutral'}">
+      <div class="metric-icon">${m.icon}</div>
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-value">${m.value}</div>
+      <div class="metric-sub">${m.detail}</div>
+    </div>
+  `).join('');
+
+  // Analysis sections
+  const sections = [
+    { label: 'Strengths', content: r.strengths, prefix: '✓ ' },
+    { label: 'Risks & Threats', content: r.risks, prefix: '⚠ ' },
+    { label: 'Critical Path to First Dollar', content: r.criticalPath, prefix: '' },
+    { label: "SAGE's Verdict", content: r.verdict_detail, prefix: '' }
+  ];
+
+  document.getElementById('analysis-body').innerHTML = sections.map(s => `
+    <div class="analysis-block">
+      <div class="analysis-label">${s.label}</div>
+      <div class="analysis-text">${formatText(s.content || '')}</div>
+    </div>
+  `).join('');
+
+  // Courses
+  document.getElementById('course-pills').innerHTML = (r.courses || []).map(c => `
+    <div class="course-pill">${c}</div>
+  `).join('');
+
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function formatText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('idea-input').value = '';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  Object.assign(selections, { time: null, budget: null, skills: [] });
+  document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

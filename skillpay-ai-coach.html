@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SAGE — Your AI Coach | SkillPay</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080b0f;
+  --surface: #0e1318;
+  --surface2: #141b23;
+  --border: rgba(0,255,136,0.12);
+  --green: #00ff88;
+  --green-dim: rgba(0,255,136,0.15);
+  --green-glow: rgba(0,255,136,0.4);
+  --blue: #00c8ff;
+  --orange: #ff8c42;
+  --red: #ff4757;
+  --text: #e8f0eb;
+  --muted: #6b7f74;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Sora', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 10%, rgba(0,255,136,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(0,200,255,0.03) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ========== ONBOARDING ========== */
+#onboarding {
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg);
+  padding:20px;
+}
+
+.ob-card {
+  width:100%;
+  max-width:560px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:48px;
+  position:relative;
+  overflow:hidden;
+}
+
+.ob-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg, transparent, var(--green), transparent);
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+
+.ob-logo {
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--green);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:32px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.ob-logo::before {
+  content:'▶';
+  font-size:8px;
+  animation: blink 1.2s step-end infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.ob-progress {
+  display:flex;
+  gap:6px;
+  margin-bottom:40px;
+}
+
+.ob-dot {
+  height:3px;
+  flex:1;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;
+  transition:background 0.4s;
+}
+
+.ob-dot.active { background:var(--green); }
+.ob-dot.done { background:rgba(0,255,136,0.4); }
+
+.ob-step { display:none; animation:fadeUp 0.4s ease; }
+.ob-step.active { display:block; }
+
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.ob-label {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--green);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+.ob-title {
+  font-size:26px;
+  font-weight:700;
+  line-height:1.3;
+  margin-bottom:8px;
+  color:#fff;
+}
+
+.ob-sub {
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:32px;
+  line-height:1.6;
+}
+
+.ob-options {
+  display:grid;
+  gap:10px;
+}
+
+.ob-opt {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:16px 20px;
+  text-align:left;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:14px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.ob-opt:hover {
+  border-color:var(--green);
+  background:var(--green-dim);
+  transform:translateX(4px);
+}
+
+.ob-opt.selected {
+  border-color:var(--green);
+  background:var(--green-dim);
+  color:#fff;
+}
+
+.ob-opt-icon { font-size:20px; }
+.ob-opt-text { flex:1; }
+.ob-opt-text strong { display:block; font-weight:600; margin-bottom:2px; }
+.ob-opt-text span { font-size:12px; color:var(--muted); }
+
+.ob-input {
+  width:100%;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:16px 20px;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+
+.ob-input:focus { border-color:var(--green); }
+.ob-input::placeholder { color:var(--muted); }
+
+.ob-btn {
+  margin-top:28px;
+  width:100%;
+  background:var(--green);
+  color:#000;
+  border:none;
+  border-radius:12px;
+  padding:16px;
+  font-family:var(--sans);
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.ob-btn:hover {
+  background:#00e87a;
+  transform:translateY(-1px);
+  box-shadow:0 8px 24px rgba(0,255,136,0.3);
+}
+
+.ob-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+.ob-back {
+  margin-top:14px;
+  width:100%;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:12px;
+  color:var(--muted);
+  font-family:var(--sans);
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.ob-back:hover { border-color:rgba(255,255,255,0.3); color:var(--text); }
+
+/* Loading screen */
+#loading-screen {
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:var(--bg);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:24px;
+}
+
+.loading-ring {
+  width:64px;height:64px;
+  border:2px solid rgba(0,255,136,0.1);
+  border-top-color:var(--green);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.loading-text {
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--green);
+  letter-spacing:2px;
+}
+
+.loading-sub {
+  font-size:13px;
+  color:var(--muted);
+  text-align:center;
+  max-width:300px;
+}
+
+/* ========== MAIN APP ========== */
+#app { display:none; min-height:100vh; }
+
+/* Sidebar */
+.sidebar {
+  position:fixed;
+  top:0;left:0;bottom:0;
+  width:240px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  padding:28px 0;
+}
+
+.sidebar-logo {
+  padding:0 24px 28px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:20px;
+}
+
+.sidebar-logo .wordmark {
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--green);
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+
+.sidebar-logo .name {
+  font-size:18px;
+  font-weight:800;
+  color:#fff;
+  margin-top:4px;
+}
+
+.sidebar-logo .name span { color:var(--green); }
+
+.sidebar-profile {
+  padding:0 24px 20px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:20px;
+}
+
+.profile-avatar {
+  width:40px;height:40px;
+  background:var(--green-dim);
+  border:1px solid var(--green);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+.profile-name {
+  font-size:13px;
+  font-weight:600;
+  color:#fff;
+  margin-bottom:2px;
+}
+
+.profile-goal {
+  font-size:11px;
+  color:var(--muted);
+  font-family:var(--mono);
+}
+
+.sidebar-nav { flex:1; padding:0 12px; }
+
+.nav-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:all 0.2s;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:500;
+  margin-bottom:4px;
+  border:none;
+  background:transparent;
+  width:100%;
+  text-align:left;
+}
+
+.nav-item:hover { background:var(--surface2); color:var(--text); }
+.nav-item.active { background:var(--green-dim); color:var(--green); }
+.nav-item .icon { font-size:16px; width:20px; text-align:center; }
+.nav-item .badge {
+  margin-left:auto;
+  background:var(--green);
+  color:#000;
+  font-size:10px;
+  font-weight:700;
+  padding:2px 7px;
+  border-radius:20px;
+}
+
+.sidebar-footer {
+  padding:16px 24px 0;
+  border-top:1px solid var(--border);
+}
+
+.streak-box {
+  background:var(--green-dim);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+}
+
+.streak-num {
+  font-family:var(--mono);
+  font-size:22px;
+  font-weight:600;
+  color:var(--green);
+  line-height:1;
+}
+
+.streak-label { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* Main content */
+.main {
+  margin-left:240px;
+  min-height:100vh;
+  padding:36px 40px;
+  position:relative;
+  z-index:1;
+}
+
+/* Tabs */
+.tab-content { display:none; }
+.tab-content.active { display:block; animation:fadeUp 0.3s ease; }
+
+/* ========== ROADMAP TAB ========== */
+.page-header {
+  margin-bottom:32px;
+}
+
+.page-label {
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--green);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.page-title {
+  font-size:30px;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:6px;
+}
+
+.page-sub { font-size:14px; color:var(--muted); }
+
+.stats-row {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:32px;
+}
+
+.stat-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.stat-card::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--green), transparent);
+}
+
+.stat-num {
+  font-family:var(--mono);
+  font-size:28px;
+  font-weight:600;
+  color:var(--green);
+  line-height:1;
+  margin-bottom:6px;
+}
+
+.stat-label { font-size:12px; color:var(--muted); }
+.stat-delta { font-size:11px; color:var(--green); margin-top:4px; font-family:var(--mono); }
+
+/* Roadmap */
+.roadmap-container {
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:24px;
+}
+
+.roadmap-main {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px;
+}
+
+.roadmap-title {
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:24px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.roadmap-title::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.phase {
+  margin-bottom:28px;
+  position:relative;
+}
+
+.phase-header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.phase-num {
+  width:28px;height:28px;
+  background:var(--green);
+  color:#000;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+  font-family:var(--mono);
+  flex-shrink:0;
+}
+
+.phase-num.locked {
+  background:var(--surface2);
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+.phase-info h4 { font-size:14px; font-weight:700; color:#fff; }
+.phase-info span { font-size:11px; color:var(--muted); font-family:var(--mono); }
+
+.phase-courses {
+  margin-left:40px;
+  display:grid;
+  gap:8px;
+}
+
+.phase-course {
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  transition:all 0.2s;
+}
+
+.phase-course:hover { border-color:var(--border); }
+.phase-course.complete { border-color:rgba(0,255,136,0.2); }
+
+.course-check {
+  width:20px;height:20px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  flex-shrink:0;
+}
+
+.course-check.done { background:var(--green); border-color:var(--green); color:#000; }
+
+.course-info { flex:1; }
+.course-info strong { font-size:13px; font-weight:600; display:block; }
+.course-info span { font-size:11px; color:var(--muted); }
+
+.course-tag {
+  font-size:10px;
+  font-family:var(--mono);
+  padding:3px 8px;
+  border-radius:20px;
+  background:var(--green-dim);
+  color:var(--green);
+}
+
+.course-tag.locked { background:rgba(255,255,255,0.04); color:var(--muted); }
+
+/* Sidebar cards */
+.roadmap-sidebar { display:flex; flex-direction:column; gap:16px; }
+
+.aside-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px;
+}
+
+.aside-title {
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.income-projection {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.proj-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.proj-item:last-child { border-bottom:none; }
+
+.proj-label { font-size:12px; color:var(--muted); }
+.proj-value { font-family:var(--mono); font-size:14px; font-weight:600; color:var(--green); }
+
+.milestones { display:flex; flex-direction:column; gap:10px; }
+
+.milestone {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.milestone:last-child { border-bottom:none; }
+
+.milestone-dot {
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--muted);
+  margin-top:5px;
+  flex-shrink:0;
+}
+
+.milestone-dot.reached { background:var(--green); box-shadow:0 0 8px var(--green-glow); }
+
+.milestone-text { font-size:12px; color:var(--text); line-height:1.5; }
+.milestone-date { font-size:10px; color:var(--muted); font-family:var(--mono); margin-top:2px; }
+
+/* ========== CHAT TAB ========== */
+.chat-layout {
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:24px;
+  height:calc(100vh - 180px);
+}
+
+.chat-main {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.chat-header {
+  padding:20px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.sage-avatar {
+  width:42px;height:42px;
+  background:linear-gradient(135deg, #00ff88, #00c8ff);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+
+.sage-info strong { display:block; font-size:14px; font-weight:700; color:#fff; }
+.sage-info span { font-size:11px; color:var(--green); font-family:var(--mono); }
+
+.online-dot {
+  width:8px;height:8px;
+  background:var(--green);
+  border-radius:50%;
+  margin-left:auto;
+  box-shadow:0 0 8px var(--green-glow);
+  animation:pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 4px var(--green-glow)}
+  50%{box-shadow:0 0 14px var(--green-glow)}
+}
+
+.chat-messages {
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.1) transparent;
+}
+
+.msg {
+  display:flex;
+  gap:12px;
+  animation:fadeUp 0.3s ease;
+}
+
+.msg.user { flex-direction:row-reverse; }
+
+.msg-avatar {
+  width:32px;height:32px;
+  border-radius:8px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+}
+
+.msg.sage .msg-avatar { background:linear-gradient(135deg, #00ff88, #00c8ff); }
+.msg.user .msg-avatar { background:var(--surface2); border:1px solid rgba(255,255,255,0.1); }
+
+.msg-bubble {
+  max-width:70%;
+  padding:14px 18px;
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.7;
+}
+
+.msg.sage .msg-bubble {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-top-left-radius:4px;
+}
+
+.msg.user .msg-bubble {
+  background:var(--green-dim);
+  border:1px solid rgba(0,255,136,0.2);
+  border-top-right-radius:4px;
+  color:#fff;
+}
+
+.msg-bubble strong { color:var(--green); }
+
+.typing-indicator { display:flex; gap:5px; padding:8px 0; align-items:center; }
+.typing-dot {
+  width:7px;height:7px;
+  background:var(--muted);
+  border-radius:50%;
+  animation:bounce 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+
+@keyframes bounce {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+
+.chat-input-area {
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:12px;
+  align-items:flex-end;
+}
+
+.chat-input {
+  flex:1;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:12px 16px;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:14px;
+  resize:none;
+  outline:none;
+  max-height:120px;
+  transition:border-color 0.2s;
+  line-height:1.5;
+}
+
+.chat-input:focus { border-color:var(--green); }
+.chat-input::placeholder { color:var(--muted); }
+
+.send-btn {
+  width:42px;height:42px;
+  background:var(--green);
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  transition:all 0.2s;
+  flex-shrink:0;
+}
+
+.send-btn:hover { background:#00e87a; transform:scale(1.05); }
+.send-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+.chat-sidebar { display:flex; flex-direction:column; gap:16px; }
+
+.quick-prompts { display:flex; flex-direction:column; gap:8px; }
+
+.quick-btn {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+  text-align:left;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:12px;
+  cursor:pointer;
+  transition:all 0.2s;
+  line-height:1.4;
+}
+
+.quick-btn:hover {
+  border-color:var(--green);
+  color:var(--green);
+  background:var(--green-dim);
+}
+
+.quick-btn strong { display:block; margin-bottom:2px; font-size:11px; color:var(--green); font-family:var(--mono); letter-spacing:1px; text-transform:uppercase; }
+
+/* ========== CHECK-IN TAB ========== */
+.checkin-layout {
+  max-width:720px;
+}
+
+.checkin-form {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  margin-bottom:24px;
+}
+
+.checkin-question {
+  margin-bottom:28px;
+}
+
+.checkin-q {
+  font-size:14px;
+  font-weight:600;
+  color:#fff;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.checkin-q .q-num {
+  width:22px;height:22px;
+  background:var(--green);
+  color:#000;
+  border-radius:50%;
+  font-size:11px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--mono);
+  flex-shrink:0;
+}
+
+.checkin-textarea {
+  width:100%;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  padding:14px;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:13px;
+  resize:vertical;
+  min-height:80px;
+  outline:none;
+  transition:border-color 0.2s;
+  line-height:1.6;
+}
+
+.checkin-textarea:focus { border-color:var(--green); }
+.checkin-textarea::placeholder { color:var(--muted); }
+
+.rating-row { display:flex; gap:10px; }
+
+.rating-btn {
+  flex:1;
+  padding:10px;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  color:var(--muted);
+  font-family:var(--sans);
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-align:center;
+}
+
+.rating-btn:hover, .rating-btn.selected {
+  border-color:var(--green);
+  background:var(--green-dim);
+  color:var(--green);
+}
+
+.analyze-btn {
+  width:100%;
+  background:var(--green);
+  color:#000;
+  border:none;
+  border-radius:12px;
+  padding:16px;
+  font-family:var(--sans);
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.analyze-btn:hover {
+  background:#00e87a;
+  transform:translateY(-1px);
+  box-shadow:0 8px 24px rgba(0,255,136,0.3);
+}
+
+.analyze-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+#checkin-result {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  display:none;
+}
+
+.result-header {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:24px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+
+.result-icon {
+  width:46px;height:46px;
+  background:linear-gradient(135deg, #00ff88, #00c8ff);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+}
+
+.result-title { font-size:18px; font-weight:700; color:#fff; }
+.result-sub { font-size:13px; color:var(--muted); margin-top:2px; }
+
+#checkin-content {
+  font-size:14px;
+  line-height:1.9;
+  color:var(--text);
+  white-space:pre-wrap;
+}
+
+#checkin-content strong { color:var(--green); }
+
+/* ========== ACTION PLAN TAB ========== */
+.action-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
+}
+
+.generate-btn {
+  background:var(--green);
+  color:#000;
+  border:none;
+  border-radius:10px;
+  padding:10px 20px;
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.generate-btn:hover { background:#00e87a; box-shadow:0 4px 16px rgba(0,255,136,0.3); }
+.generate-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+.action-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.action-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+}
+
+.action-card.full { grid-column:1/-1; }
+
+.action-card-title {
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.action-card-title .icon { font-size:16px; }
+
+#action-plan-content {
+  font-size:13px;
+  line-height:1.9;
+  color:var(--text);
+  white-space:pre-wrap;
+}
+
+#action-plan-content strong { color:var(--green); }
+
+.task-list { display:flex; flex-direction:column; gap:10px; }
+
+.task-item {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:12px;
+  background:var(--surface2);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.05);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.task-item:hover { border-color:var(--border); }
+.task-item.done { opacity:0.5; }
+.task-item.done .task-text { text-decoration:line-through; }
+
+.task-check {
+  width:18px;height:18px;
+  border-radius:4px;
+  border:1.5px solid var(--muted);
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  margin-top:1px;
+  transition:all 0.2s;
+}
+
+.task-item.done .task-check { background:var(--green); border-color:var(--green); color:#000; }
+
+.task-text { font-size:13px; line-height:1.5; }
+.task-priority { font-size:10px; font-family:var(--mono); margin-top:2px; }
+.task-priority.high { color:var(--orange); }
+.task-priority.medium { color:var(--blue); }
+.task-priority.low { color:var(--muted); }
+
+/* ========== INSIGHTS TAB ========== */
+.insights-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.insight-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+}
+
+.insight-card.full { grid-column:1/-1; }
+
+.insight-title {
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.progress-bars { display:flex; flex-direction:column; gap:14px; }
+
+.progress-item {}
+.progress-label { display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:var(--text); }
+.progress-label span:last-child { color:var(--green); font-family:var(--mono); }
+
+.progress-bar {
+  height:6px;
+  background:rgba(255,255,255,0.06);
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.progress-fill {
+  height:100%;
+  background:var(--green);
+  border-radius:3px;
+  transition:width 1s ease;
+}
+
+#insights-content {
+  font-size:13px;
+  line-height:1.9;
+  color:var(--text);
+  white-space:pre-wrap;
+}
+
+#insights-content strong { color:var(--green); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+
+/* Mobile */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:20px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .roadmap-container,.chat-layout,.action-grid,.insights-grid{grid-template-columns:1fr}
+  .chat-layout{height:auto}
+}
+
+/* Notification */
+.notif {
+  position:fixed;
+  bottom:24px;right:24px;
+  background:var(--surface);
+  border:1px solid var(--green);
+  border-radius:12px;
+  padding:14px 20px;
+  font-size:13px;
+  color:var(--text);
+  z-index:999;
+  animation:slideIn 0.3s ease;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+@keyframes slideIn {
+  from{transform:translateX(100px);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-card">
+    <div class="ob-logo">SAGE — SkillPay AI Coach</div>
+    <div class="ob-progress" id="ob-progress"></div>
+
+    <!-- Step 1: Name -->
+    <div class="ob-step active" id="step-1">
+      <div class="ob-label">Step 1 of 5 — Identity</div>
+      <div class="ob-title">What should SAGE call you?</div>
+      <div class="ob-sub">SAGE is your personal AI coach. The more it knows about you, the more brutally specific its advice becomes.</div>
+      <input class="ob-input" id="name-input" placeholder="Your first name..." maxlength="30"/>
+      <button class="ob-btn" onclick="nextStep(1)">Continue →</button>
+    </div>
+
+    <!-- Step 2: Goal -->
+    <div class="ob-step" id="step-2">
+      <div class="ob-label">Step 2 of 5 — Primary Goal</div>
+      <div class="ob-title">What's your #1 income goal?</div>
+      <div class="ob-sub">Be honest. This determines your roadmap priority.</div>
+      <div class="ob-options" id="goal-options">
+        <button class="ob-opt" onclick="selectOpt(this,'goal','first100')">
+          <span class="ob-opt-icon">🎯</span>
+          <span class="ob-opt-text"><strong>Make my first $100 online</strong><span>Complete beginner — never made money online</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'goal','freelance')">
+          <span class="ob-opt-icon">💼</span>
+          <span class="ob-opt-text"><strong>Land freelance clients consistently</strong><span>Sell my skills for $500-2K/month</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'goal','passive')">
+          <span class="ob-opt-icon">📦</span>
+          <span class="ob-opt-text"><strong>Build passive income streams</strong><span>Courses, digital products, affiliate income</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'goal','scale')">
+          <span class="ob-opt-icon">🚀</span>
+          <span class="ob-opt-text"><strong>Scale an existing side hustle</strong><span>Already making some money, want to grow</span></span>
+        </button>
+      </div>
+      <button class="ob-btn" id="goal-btn" disabled onclick="nextStep(2)">Continue →</button>
+      <button class="ob-back" onclick="prevStep(2)">← Back</button>
+    </div>
+
+    <!-- Step 3: Time -->
+    <div class="ob-step" id="step-3">
+      <div class="ob-label">Step 3 of 5 — Available Time</div>
+      <div class="ob-title">How much time can you commit daily?</div>
+      <div class="ob-sub">Realistic answer only. This is how SAGE sets your timeline and expectations.</div>
+      <div class="ob-options" id="time-options">
+        <button class="ob-opt" onclick="selectOpt(this,'time','30min')">
+          <span class="ob-opt-icon">⏱️</span>
+          <span class="ob-opt-text"><strong>Under 30 minutes</strong><span>Busy with work/school — limited windows</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'time','1hr')">
+          <span class="ob-opt-icon">🕐</span>
+          <span class="ob-opt-text"><strong>1 hour per day</strong><span>Consistent but constrained schedule</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'time','2hr')">
+          <span class="ob-opt-icon">🕑</span>
+          <span class="ob-opt-text"><strong>2-3 hours per day</strong><span>Serious about making this work</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'time','fulltime')">
+          <span class="ob-opt-icon">🔥</span>
+          <span class="ob-opt-text"><strong>4+ hours per day</strong><span>This is my main priority right now</span></span>
+        </button>
+      </div>
+      <button class="ob-btn" id="time-btn" disabled onclick="nextStep(3)">Continue →</button>
+      <button class="ob-back" onclick="prevStep(3)">← Back</button>
+    </div>
+
+    <!-- Step 4: Skills -->
+    <div class="ob-step" id="step-4">
+      <div class="ob-label">Step 4 of 5 — Your Skills</div>
+      <div class="ob-title">What are your strongest skills?</div>
+      <div class="ob-sub">Pick all that apply. SAGE uses these to find your fastest income path.</div>
+      <div class="ob-options" id="skill-options">
+        <button class="ob-opt" onclick="toggleSkill(this,'writing')">
+          <span class="ob-opt-icon">✍️</span>
+          <span class="ob-opt-text"><strong>Writing & Content</strong><span>Blogs, copywriting, social media</span></span>
+        </button>
+        <button class="ob-opt" onclick="toggleSkill(this,'design')">
+          <span class="ob-opt-icon">🎨</span>
+          <span class="ob-opt-text"><strong>Design & Video</strong><span>Graphics, editing, thumbnails</span></span>
+        </button>
+        <button class="ob-opt" onclick="toggleSkill(this,'tech')">
+          <span class="ob-opt-icon">💻</span>
+          <span class="ob-opt-text"><strong>Tech & Coding</strong><span>Web dev, automation, AI</span></span>
+        </button>
+        <button class="ob-opt" onclick="toggleSkill(this,'marketing')">
+          <span class="ob-opt-icon">📱</span>
+          <span class="ob-opt-text"><strong>Social Media & Marketing</strong><span>Instagram, TikTok, ads</span></span>
+        </button>
+        <button class="ob-opt" onclick="toggleSkill(this,'none')">
+          <span class="ob-opt-icon">🌱</span>
+          <span class="ob-opt-text"><strong>No specific skill yet</strong><span>Still figuring out what I'm good at</span></span>
+        </button>
+      </div>
+      <button class="ob-btn" id="skill-btn" disabled onclick="nextStep(4)">Continue →</button>
+      <button class="ob-back" onclick="prevStep(4)">← Back</button>
+    </div>
+
+    <!-- Step 5: Situation -->
+    <div class="ob-step" id="step-5">
+      <div class="ob-label">Step 5 of 5 — Your Situation</div>
+      <div class="ob-title">What's your biggest challenge right now?</div>
+      <div class="ob-sub">SAGE will attack this head-on from day one.</div>
+      <div class="ob-options" id="challenge-options">
+        <button class="ob-opt" onclick="selectOpt(this,'challenge','motivation')">
+          <span class="ob-opt-icon">😴</span>
+          <span class="ob-opt-text"><strong>Staying consistent and motivated</strong><span>Start strong then lose momentum</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'challenge','ideas')">
+          <span class="ob-opt-icon">💭</span>
+          <span class="ob-opt-text"><strong>Finding the right niche or idea</strong><span>Don't know what to focus on</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'challenge','clients')">
+          <span class="ob-opt-icon">🤝</span>
+          <span class="ob-opt-text"><strong>Getting clients or customers</strong><span>Have a skill but can't find paying people</span></span>
+        </button>
+        <button class="ob-opt" onclick="selectOpt(this,'challenge','time')">
+          <span class="ob-opt-icon">⌚</span>
+          <span class="ob-opt-text"><strong>Not enough time</strong><span>Work/school takes most of my day</span></span>
+        </button>
+      </div>
+      <button class="ob-btn" id="challenge-btn" disabled onclick="startSAGE()">🚀 Launch SAGE</button>
+      <button class="ob-back" onclick="prevStep(5)">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="loading-ring"></div>
+  <div class="loading-text">INITIALIZING SAGE</div>
+  <div class="loading-sub" id="loading-msg">Analyzing your profile and building your personalized roadmap...</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="wordmark">SkillPay</div>
+      <div class="name">S<span>A</span>GE</div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="profile-avatar">🧠</div>
+      <div class="profile-name" id="sidebar-name">Loading...</div>
+      <div class="profile-goal" id="sidebar-goal">—</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="switchTab('roadmap',this)">
+        <span class="icon">🗺️</span> My Roadmap
+      </button>
+      <button class="nav-item" onclick="switchTab('chat',this)">
+        <span class="icon">🤖</span> AI Coach
+        <span class="badge">LIVE</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('checkin',this)">
+        <span class="icon">📋</span> Weekly Check-in
+      </button>
+      <button class="nav-item" onclick="switchTab('actions',this)">
+        <span class="icon">⚡</span> Action Plan
+      </button>
+      <button class="nav-item" onclick="switchTab('insights',this)">
+        <span class="icon">📊</span> Insights
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="streak-box">
+        <div class="streak-num" id="streak-num">0</div>
+        <div class="streak-label">day streak 🔥</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- ROADMAP TAB -->
+    <div class="tab-content active" id="tab-roadmap">
+      <div class="page-header">
+        <div class="page-label">Personalized Learning Path</div>
+        <div class="page-title" id="roadmap-greeting">Your Custom Roadmap</div>
+        <div class="page-sub" id="roadmap-sub">AI-generated based on your goals, skills, and available time.</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-completed">0</div>
+          <div class="stat-label">Lessons Completed</div>
+          <div class="stat-delta" id="stat-progress">0% of your path</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-income">$0</div>
+          <div class="stat-label">Projected Monthly (30 days)</div>
+          <div class="stat-delta">↑ based on your pace</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-days">0</div>
+          <div class="stat-label">Days Until First $100</div>
+          <div class="stat-delta" id="stat-pace">Keep going</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-rank">C</div>
+          <div class="stat-label">Momentum Rank</div>
+          <div class="stat-delta" id="stat-rank-sub">Based on consistency</div>
+        </div>
+      </div>
+
+      <div class="roadmap-container">
+        <div class="roadmap-main">
+          <div class="roadmap-title">📍 Your Learning Path</div>
+          <div id="roadmap-phases">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="roadmap-sidebar">
+          <div class="aside-card">
+            <div class="aside-title">💰 Income Projections</div>
+            <div class="income-projection">
+              <div class="proj-item">
+                <span class="proj-label">Month 1 (realistic)</span>
+                <span class="proj-value" id="proj-1">$0</span>
+              </div>
+              <div class="proj-item">
+                <span class="proj-label">Month 3 (consistent)</span>
+                <span class="proj-value" id="proj-3">$0</span>
+              </div>
+              <div class="proj-item">
+                <span class="proj-label">Month 6 (scaled)</span>
+                <span class="proj-value" id="proj-6">$0</span>
+              </div>
+              <div class="proj-item">
+                <span class="proj-label">Month 12 (potential)</span>
+                <span class="proj-value" id="proj-12">$0</span>
+              </div>
+            </div>
+          </div>
+          <div class="aside-card">
+            <div class="aside-title">🏆 Milestones</div>
+            <div class="milestones" id="milestones-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div class="tab-content" id="tab-chat">
+      <div class="page-header">
+        <div class="page-label">Real-Time Coaching</div>
+        <div class="page-title">Talk to SAGE</div>
+        <div class="page-sub">SkillPay's exclusive AI income coach. Knows your goals, progress, and situation.</div>
+      </div>
+
+      <div class="chat-layout">
+        <div class="chat-main">
+          <div class="chat-header">
+            <div class="sage-avatar">🧠</div>
+            <div class="sage-info">
+              <strong>SAGE</strong>
+              <span>SkillPay's AI Income Coach</span>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <!-- Messages added by JS -->
+          </div>
+          <div class="chat-input-area">
+            <textarea class="chat-input" id="chat-input" placeholder="Ask SAGE anything about your goals, strategy, or next steps..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+
+        <div class="chat-sidebar">
+          <div class="aside-card">
+            <div class="aside-title">⚡ Quick Questions</div>
+            <div class="quick-prompts">
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>Stuck</strong>
+                I don't know what to do next — help me get unstuck
+              </button>
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>No Money Yet</strong>
+                I've been learning but haven't made a dollar. What's wrong?
+              </button>
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>Motivation</strong>
+                I'm losing motivation. I have work and school and no time.
+              </button>
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>First Client</strong>
+                How do I land my very first paying client this week?
+              </button>
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>Niche</strong>
+                What niche should I focus on given my skills?
+              </button>
+              <button class="quick-btn" onclick="quickPrompt(this)">
+                <strong>Reality Check</strong>
+                Be brutally honest — am I on track to hit my income goal?
+              </button>
+            </div>
+          </div>
+          <div class="aside-card">
+            <div class="aside-title">📈 Your Context</div>
+            <div id="chat-context" style="font-size:12px;line-height:1.8;color:var(--muted);">
+              Loading your profile...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECK-IN TAB -->
+    <div class="tab-content" id="tab-checkin">
+      <div class="page-header">
+        <div class="page-label">Weekly Performance Review</div>
+        <div class="page-title">Weekly Check-In</div>
+        <div class="page-sub">SAGE analyzes your week and tells you exactly what to fix and what to double down on.</div>
+      </div>
+      <div class="checkin-layout">
+        <div class="checkin-form">
+          <div class="checkin-question">
+            <div class="checkin-q"><span class="q-num">1</span> What did you actually DO this week? (be specific)</div>
+            <textarea class="checkin-textarea" id="ci-1" placeholder="e.g. Completed 3 lessons on affiliate marketing, posted 2 Instagram reels, reached out to 5 potential clients..."></textarea>
+          </div>
+          <div class="checkin-question">
+            <div class="checkin-q"><span class="q-num">2</span> Did you make any money this week? How much and from what?</div>
+            <textarea class="checkin-textarea" id="ci-2" placeholder="e.g. $0 — still setting up. OR $150 from one freelance logo design..."></textarea>
+          </div>
+          <div class="checkin-question">
+            <div class="checkin-q"><span class="q-num">3</span> What did you NOT do that you planned to?</div>
+            <textarea class="checkin-textarea" id="ci-3" placeholder="e.g. Didn't post on Instagram. Skipped 2 course lessons. Didn't reach out to any clients..."></textarea>
+          </div>
+          <div class="checkin-question">
+            <div class="checkin-q"><span class="q-num">4</span> What's your #1 obstacle right now?</div>
+            <textarea class="checkin-textarea" id="ci-4" placeholder="e.g. I don't know what niche to pick. I'm scared of rejection. I have no time after work..."></textarea>
+          </div>
+          <div class="checkin-question">
+            <div class="checkin-q"><span class="q-num">5</span> Rate your week</div>
+            <div class="rating-row">
+              <button class="rating-btn" onclick="selectRating(this,'1')">😔 1</button>
+              <button class="rating-btn" onclick="selectRating(this,'2')">😐 2</button>
+              <button class="rating-btn" onclick="selectRating(this,'3')">🙂 3</button>
+              <button class="rating-btn" onclick="selectRating(this,'4')">😊 4</button>
+              <button class="rating-btn" onclick="selectRating(this,'5')">🔥 5</button>
+            </div>
+          </div>
+          <button class="analyze-btn" id="analyze-btn" onclick="analyzeWeek()">
+            🧠 Analyze My Week with SAGE
+          </button>
+        </div>
+
+        <div id="checkin-result">
+          <div class="result-header">
+            <div class="result-icon">🧠</div>
+            <div>
+              <div class="result-title">SAGE's Weekly Analysis</div>
+              <div class="result-sub" id="checkin-date">Just now</div>
+            </div>
+          </div>
+          <div id="checkin-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION PLAN TAB -->
+    <div class="tab-content" id="tab-actions">
+      <div class="action-header">
+        <div>
+          <div class="page-label">Daily Execution</div>
+          <div class="page-title">Today's Action Plan</div>
+        </div>
+        <button class="generate-btn" id="generate-btn" onclick="generateActionPlan()">
+          ⚡ Generate Today's Plan
+        </button>
+      </div>
+
+      <div class="action-grid">
+        <div class="action-card full">
+          <div class="action-card-title"><span class="icon">🎯</span> SAGE's Plan for Today</div>
+          <div id="action-plan-content" style="color:var(--muted);font-size:14px;">
+            Click "Generate Today's Plan" and SAGE will create a personalized action plan based on your goals, progress, and available time.
+          </div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-title"><span class="icon">✅</span> Task Tracker</div>
+          <div class="task-list" id="task-list">
+            <div style="font-size:13px;color:var(--muted);">Generate a plan to see your tasks here.</div>
+          </div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-card-title"><span class="icon">🧠</span> SAGE's Focus Note</div>
+          <div id="focus-note" style="font-size:13px;line-height:1.8;color:var(--muted);">
+            Your personalized focus insight will appear here after generating a plan.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS TAB -->
+    <div class="tab-content" id="tab-insights">
+      <div class="page-header">
+        <div class="page-label">Performance Intelligence</div>
+        <div class="page-title">Your Insights</div>
+        <div class="page-sub">SAGE's analysis of your patterns, strengths, and blindspots.</div>
+      </div>
+
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-title">📈 Course Progress</div>
+          <div class="progress-bars" id="progress-bars">
+            <!-- Generated -->
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-title">🎯 Goal Alignment Score</div>
+          <div id="alignment-content" style="font-size:13px;color:var(--muted);line-height:1.8;">
+            Loading your alignment data...
+          </div>
+        </div>
+
+        <div class="insight-card full">
+          <div class="insight-title">🧠 SAGE's Deep Analysis</div>
+          <div id="insights-content" style="font-size:13px;color:var(--muted);line-height:1.8;">
+            <button onclick="loadInsights()" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;">Load My SAGE Analysis</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end #app -->
+
+<script>
+// ===========================
+// CONFIG — Paste your free Gemini API key here
+// Get it free at: aistudio.google.com → Get API Key
+// ===========================
+const GEMINI_KEY = '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';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+
+async function callGemini(prompt, systemPrompt = '') {
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { maxOutputTokens: 1000, temperature: 0.8 }
+  };
+  if (systemPrompt) {
+    body.systemInstruction = { parts: [{ text: systemPrompt }] };
+  }
+  const res = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+}
+
+async function callGeminiChat(history, systemPrompt = '') {
+  // Convert history to Gemini format (assistant → model)
+  const contents = history.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  const body = {
+    contents,
+    generationConfig: { maxOutputTokens: 1000, temperature: 0.85 }
+  };
+  if (systemPrompt) {
+    body.systemInstruction = { parts: [{ text: systemPrompt }] };
+  }
+  const res = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+}
+
+// ===========================
+// STATE
+// ===========================
+let profile = {};
+let selectedSkills = [];
+let weekRating = null;
+let chatHistory = [];
+let tasks = [];
+
+const COURSES = {
+  first100: { name: "Make Your First $100 Online", tag: "beginner", priority: ['first100','freelance','passive','scale'] },
+  freelancing: { name: "Land Your First Freelance Client", tag: "income", priority: ['freelance','scale','first100','passive'] },
+  social: { name: "Grow to 1,000 Followers Fast", tag: "growth", priority: ['passive','marketing','first100','scale'] },
+  digitalproducts: { name: "Sell Your First Digital Product", tag: "passive", priority: ['passive','scale','first100','freelance'] },
+  affiliate: { name: "Master Affiliate Marketing", tag: "passive", priority: ['passive','first100','scale','freelance'] },
+  sidehustle: { name: "Start a Profitable Side Hustle", tag: "income", priority: ['first100','freelance','scale','passive'] },
+  seo: { name: "SEO & Content Marketing", tag: "growth", priority: ['passive','scale','marketing','first100'] },
+  email: { name: "Email Marketing That Converts", tag: "scale", priority: ['scale','passive','freelance','first100'] },
+  linkedin: { name: "Personal Branding on LinkedIn", tag: "brand", priority: ['freelance','clients','scale','passive'] },
+  instagram: { name: "Instagram Growth Strategy", tag: "growth", priority: ['passive','marketing','first100','scale'] },
+  tiktok: { name: "TikTok Creator Playbook", tag: "growth", priority: ['passive','marketing','first100','scale'] },
+  course: { name: "Launch Your First Online Course", tag: "passive", priority: ['passive','scale','freelance','first100'] },
+  ai: { name: "Build an AI-Powered Business", tag: "advanced", priority: ['scale','tech','passive','freelance'] },
+  dropshipping: { name: "Dropshipping Step-by-Step", tag: "ecom", priority: ['passive','first100','scale','freelance'] },
+  daytrading: { name: "Day Trading for Beginners", tag: "invest", priority: ['scale','passive','first100','freelance'] },
+  advancedcrypto: { name: "Crypto Trading Fundamentals", tag: "invest", priority: ['scale','passive','first100','freelance'] },
+  options: { name: "Options Trading Basics", tag: "invest", priority: ['scale','passive','first100','freelance'] }
+};
+
+// ===========================
+// ONBOARDING
+// ===========================
+function initProgress() {
+  const prog = document.getElementById('ob-progress');
+  prog.innerHTML = '';
+  for(let i=1;i<=5;i++) {
+    const d = document.createElement('div');
+    d.className = 'ob-dot';
+    d.id = 'dot-'+i;
+    prog.appendChild(d);
+  }
+  updateDots(1);
+}
+
+function updateDots(current) {
+  for(let i=1;i<=5;i++) {
+    const d = document.getElementById('dot-'+i);
+    if(i<current) d.className='ob-dot done';
+    else if(i===current) d.className='ob-dot active';
+    else d.className='ob-dot';
+  }
+}
+
+function nextStep(from) {
+  if(from===1) {
+    const n = document.getElementById('name-input').value.trim();
+    if(!n){alert('Please enter your name!');return;}
+    profile.name = n;
+  }
+  document.getElementById('step-'+from).classList.remove('active');
+  document.getElementById('step-'+(from+1)).classList.add('active');
+  updateDots(from+1);
+}
+
+function prevStep(from) {
+  document.getElementById('step-'+from).classList.remove('active');
+  document.getElementById('step-'+(from-1)).classList.add('active');
+  updateDots(from-1);
+}
+
+function selectOpt(el, field, val) {
+  el.closest('.ob-options').querySelectorAll('.ob-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  profile[field] = val;
+  const btn = document.getElementById(field+'-btn');
+  if(btn) btn.disabled = false;
+}
+
+function toggleSkill(el, skill) {
+  if(skill === 'none') {
+    selectedSkills = ['none'];
+    document.getElementById('skill-options').querySelectorAll('.ob-opt').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');
+  } else {
+    const noneIdx = selectedSkills.indexOf('none');
+    if(noneIdx > -1) selectedSkills.splice(noneIdx,1);
+    document.querySelector('[onclick="toggleSkill(this,\'none\')"]').classList.remove('selected');
+    
+    if(el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      selectedSkills = selectedSkills.filter(s=>s!==skill);
+    } else {
+      el.classList.add('selected');
+      selectedSkills.push(skill);
+    }
+  }
+  document.getElementById('skill-btn').disabled = selectedSkills.length === 0;
+}
+
+function startSAGE() {
+  profile.skills = selectedSkills;
+  profile.weekRating = weekRating;
+  profile.startDate = new Date().toISOString();
+  
+  // Read existing SkillPay progress from localStorage
+  profile.completedLessons = [];
+  try {
+    const prog = JSON.parse(localStorage.getItem('skillpay_lesson_progress') || '{}');
+    Object.keys(prog).forEach(k => {
+      if(prog[k] === true || prog[k] === 'complete') profile.completedLessons.push(k);
+    });
+  } catch(e){}
+  
+  localStorage.setItem('sage_profile', JSON.stringify(profile));
+  
+  document.getElementById('onboarding').style.display = 'none';
+  const ls = document.getElementById('loading-screen');
+  ls.style.display = 'flex';
+  
+  const msgs = [
+    'Analyzing your goals and skills...',
+    'Building your personalized roadmap...',
+    'Calculating income projections...',
+    'Preparing SAGE for your first session...',
+    'Almost ready...'
+  ];
+  
+  let i = 0;
+  const interval = setInterval(() => {
+    if(i < msgs.length) {
+      document.getElementById('loading-msg').textContent = msgs[i];
+      i++;
+    }
+  }, 600);
+  
+  setTimeout(() => {
+    clearInterval(interval);
+    ls.style.display = 'none';
+    initApp();
+  }, 3200);
+}
+
+// ===========================
+// APP INIT
+// ===========================
+function initApp() {
+  document.getElementById('app').style.display = 'block';
+  
+  // Load profile
+  try { profile = JSON.parse(localStorage.getItem('sage_profile') || '{}'); } catch(e){}
+  
+  const name = profile.name || 'Learner';
+  document.getElementById('sidebar-name').textContent = name;
+  
+  const goalLabels = {
+    first100: 'Make First $100',
+    freelance: 'Land Freelance Clients',
+    passive: 'Build Passive Income',
+    scale: 'Scale Side Hustle'
+  };
+  document.getElementById('sidebar-goal').textContent = goalLabels[profile.goal] || 'Income Growth';
+  
+  // Streak
+  updateStreak();
+  
+  // Build roadmap
+  buildRoadmap();
+  
+  // Load stats
+  loadStats();
+  
+  // Init chat
+  initChat();
+  
+  // Init context
+  updateChatContext();
+  
+  // Progress bars
+  buildProgressBars();
+  
+  // Alignment
+  buildAlignment();
+}
+
+function updateStreak() {
+  const streak = parseInt(localStorage.getItem('sage_streak') || '0');
+  const lastVisit = localStorage.getItem('sage_last_visit');
+  const today = new Date().toDateString();
+  
+  if(lastVisit !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate()-1);
+    const newStreak = lastVisit === yesterday.toDateString() ? streak+1 : 1;
+    localStorage.setItem('sage_streak', newStreak);
+    localStorage.setItem('sage_last_visit', today);
+    document.getElementById('streak-num').textContent = newStreak;
+  } else {
+    document.getElementById('streak-num').textContent = streak;
+  }
+}
+
+// ===========================
+// ROADMAP
+// ===========================
+function buildRoadmap() {
+  const goal = profile.goal || 'first100';
+  const time = profile.time || '1hr';
+  const skills = profile.skills || [];
+  const name = profile.name || 'You';
+  
+  document.getElementById('roadmap-greeting').textContent = `${name}'s Custom Roadmap`;
+  
+  const timeLabels = {
+    '30min': '30 min/day',
+    '1hr': '1 hr/day',
+    '2hr': '2-3 hrs/day',
+    'fulltime': '4+ hrs/day'
+  };
+  document.getElementById('roadmap-sub').textContent = 
+    `AI-generated for your goal: ${document.getElementById('sidebar-goal').textContent} · ${timeLabels[time]}`;
+  
+  // Prioritize courses
+  const sorted = Object.entries(COURSES).sort((a,b) => {
+    const ap = a[1].priority.indexOf(goal);
+    const bp = b[1].priority.indexOf(goal);
+    return (ap===-1?99:ap) - (bp===-1?99:bp);
+  });
+  
+  // Split into phases
+  const phase1 = sorted.slice(0,4);
+  const phase2 = sorted.slice(4,9);
+  const phase3 = sorted.slice(9,14);
+  const phase4 = sorted.slice(14);
+  
+  const phases = [
+    { num:1, title:'Foundation', sub:'Start here — master the basics', courses:phase1, locked:false },
+    { num:2, title:'Growth', sub:'Apply what you learned, start earning', courses:phase2, locked:false },
+    { num:3, title:'Scale', sub:'Double down on what works', courses:phase3, locked:true },
+    { num:4, title:'Advanced', sub:'Pro-level strategies and markets', courses:phase4, locked:true }
+  ];
+  
+  const completedSet = new Set(profile.completedLessons || []);
+  
+  let html = '';
+  phases.forEach(ph => {
+    html += `<div class="phase">
+      <div class="phase-header">
+        <div class="phase-num ${ph.locked?'locked':''}">${ph.num}</div>
+        <div class="phase-info">
+          <h4>Phase ${ph.num}: ${ph.title}</h4>
+          <span>${ph.sub}</span>
+        </div>
+      </div>
+      <div class="phase-courses">`;
+    
+    ph.courses.forEach(([id, c]) => {
+      const done = [...completedSet].some(k => k.startsWith(id));
+      const locked = ph.locked;
+      html += `<div class="phase-course ${done?'complete':''}">
+        <div class="course-check ${done?'done':''}">${done?'✓':''}</div>
+        <div class="course-info">
+          <strong>${c.name}</strong>
+          <span>${done?'Completed':'Ready to start'}</span>
+        </div>
+        <span class="course-tag ${locked?'locked':''}">${c.tag}</span>
+      </div>`;
+    });
+    
+    html += `</div></div>`;
+  });
+  
+  document.getElementById('roadmap-phases').innerHTML = html;
+  
+  // Projections based on goal + time
+  const projections = {
+    first100: { p1:'$0-50', p3:'$150-400', p6:'$500-1.2K', p12:'$1K-3K' },
+    freelance: { p1:'$0-200', p3:'$500-1.5K', p6:'$1.5K-4K', p12:'$3K-8K' },
+    passive: { p1:'$0', p3:'$50-200', p6:'$300-800', p12:'$800-3K' },
+    scale: { p1:'$200-500', p3:'$800-2K', p6:'$2K-6K', p12:'$5K-15K' }
+  };
+  
+  const proj = projections[goal] || projections.first100;
+  document.getElementById('proj-1').textContent = proj.p1;
+  document.getElementById('proj-3').textContent = proj.p3;
+  document.getElementById('proj-6').textContent = proj.p6;
+  document.getElementById('proj-12').textContent = proj.p12;
+  
+  // Milestones
+  const ms = [
+    { label:'Complete Phase 1 courses', date:'Week 1-2', reached:false },
+    { label:'Take your first action step outside the course', date:'Week 2', reached:false },
+    { label:'Make your first dollar online', date:'Week 3-6', reached:false },
+    { label:'Hit $100 total earnings', date:'Month 2-3', reached:false },
+    { label:'Consistent $500/month', date:'Month 4-6', reached:false },
+    { label:'First $1,000 month', date:'Month 6-12', reached:false }
+  ];
+  
+  document.getElementById('milestones-list').innerHTML = ms.map(m => `
+    <div class="milestone">
+      <div class="milestone-dot ${m.reached?'reached':''}"></div>
+      <div>
+        <div class="milestone-text">${m.label}</div>
+        <div class="milestone-date">${m.date}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadStats() {
+  const completed = (profile.completedLessons || []).length;
+  const total = 97;
+  const pct = Math.round((completed/total)*100);
+  
+  document.getElementById('stat-completed').textContent = completed;
+  document.getElementById('stat-progress').textContent = `${pct}% of your path`;
+  
+  // Income estimate
+  const incomeMap = { first100: '$50-200', freelance: '$200-600', passive: '$0-100', scale: '$300-800' };
+  document.getElementById('stat-income').textContent = incomeMap[profile.goal] || '$0';
+  
+  // Days
+  const timeMap = { '30min': 90, '1hr': 60, '2hr': 40, 'fulltime': 25 };
+  const days = timeMap[profile.time] || 60;
+  document.getElementById('stat-days').textContent = Math.max(1, days - completed*0.5).toFixed(0);
+  document.getElementById('stat-pace').textContent = `At current ${profile.time || '1hr'}/day pace`;
+  
+  // Rank
+  const rank = pct >= 50 ? 'A' : pct >= 25 ? 'B' : pct >= 10 ? 'C' : 'D';
+  document.getElementById('stat-rank').textContent = rank;
+  document.getElementById('stat-rank-sub').textContent = rank==='A'?'Outstanding':rank==='B'?'Good progress':rank==='C'?'Just started':'Not started yet';
+}
+
+// ===========================
+// CHAT
+// ===========================
+function buildSystemPrompt() {
+  const goalLabels = { first100:'Make First $100 Online', freelance:'Land Freelance Clients', passive:'Build Passive Income', scale:'Scale Side Hustle' };
+  const timeLabels = { '30min':'under 30 minutes per day', '1hr':'about 1 hour per day', '2hr':'2-3 hours per day', fulltime:'4+ hours per day' };
+  const challengeLabels = { motivation:'staying consistent and motivated', ideas:'finding the right niche or idea', clients:'getting clients or customers', time:'not having enough time due to work/school' };
+  
+  return `You are SAGE — SkillPay's exclusive AI income coach. You were built specifically for SkillPay and exist for one purpose only: helping students make money online through the SkillPay curriculum.
+
+YOUR IDENTITY:
+- Your name is SAGE. You are SkillPay's proprietary AI coach.
+- You were designed exclusively for SkillPay students.
+- You do NOT identify as Gemini, Claude, ChatGPT, or any other AI.
+- If anyone asks what AI you are, what model powers you, or who made you, say: "I'm SAGE — SkillPay's AI coach. I'm not able to share details about the technology behind me."
+- You have no knowledge of topics outside the SkillPay curriculum.
+
+YOUR STUDENT'S PROFILE:
+- Name: ${profile.name || 'Student'}
+- Primary Goal: ${goalLabels[profile.goal] || 'Make money online'}
+- Daily Time Available: ${timeLabels[profile.time] || '1 hour per day'}
+- Skills: ${(profile.skills || []).join(', ') || 'Still developing'}
+- Biggest Challenge: ${challengeLabels[profile.challenge] || 'Getting started'}
+- Lessons Completed: ${(profile.completedLessons || []).length} out of 97 total
+
+SKILLPAY COURSES YOU COACH ON (ONLY topics you discuss):
+1. Make Your First $100 Online — finding first income opportunities, beginner mindset
+2. Land Your First Freelance Client — pitching, proposals, finding clients, niching down
+3. Grow to 1,000 Followers Fast — organic social growth, content strategy, consistency
+4. Sell Your First Digital Product — creating, pricing, and launching digital products
+5. Master Affiliate Marketing — finding offers, content, traffic, commissions
+6. Start a Profitable Side Hustle — validating ideas, starting lean, first revenue
+7. SEO & Content Marketing — ranking on Google, blogging, keyword strategy
+8. Email Marketing That Converts — list building, sequences, open rates, revenue
+9. Personal Branding on LinkedIn — profile optimization, content, B2B networking
+10. Instagram Growth Strategy — reels, hashtags, engagement, monetization
+11. TikTok Creator Playbook — viral content, hooks, growth, brand deals
+12. Launch Your First Online Course — course creation, pricing, launch strategy
+13. Build an AI-Powered Business — using AI tools to build and automate income
+14. Dropshipping Step-by-Step — product research, suppliers, store setup, ads
+15. Day Trading for Beginners — chart reading, risk management, paper trading
+16. Crypto Trading Fundamentals — crypto markets, DeFi, wallets, DCA strategy
+17. Options Trading Basics — calls, puts, covered calls, risk management
+
+STRICT TOPIC RULES — CRITICAL:
+- You ONLY answer questions related to the 17 courses above and the student's income/business journey.
+- If asked about ANYTHING outside these topics (politics, sports, relationships, homework, coding unrelated to courses, health, entertainment, news, other AI tools, etc.) you MUST decline and redirect.
+- Use this format for off-topic questions: "I'm only set up to help you with your SkillPay journey — [topic] is outside what I coach on. What I CAN help you with is [relevant course topic]. Want to work on that?"
+- Never break character. Never answer off-topic questions even if the student insists.
+- Do not write code, essays, poems, or anything unrelated to SkillPay courses.
+
+YOUR COACHING STYLE:
+- Brutally honest, specific, and actionable. Never generic.
+- Reference the student's exact situation constantly.
+- Call out excuses without being cruel.
+- Celebrate wins, no matter how small.
+- Give numbered action steps, not vague suggestions.
+- Think like a $500/hour business coach focused purely on making money online.
+- If someone says they have no time, give them a 15-minute version of what they need to do.
+- End every response with one clear "Do this TODAY:" action.
+- Keep responses concise but high-value. Use bold and numbered lists when helpful.
+- Never say "Great question!" or use filler praise.
+- Always tie advice back to the specific SkillPay course most relevant to their situation.`;
+}
+
+function saveChatHistory() {
+  const trimmed = chatHistory.slice(-40);
+  localStorage.setItem('sage_chat_history', JSON.stringify(trimmed));
+}
+
+function loadChatHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sage_chat_history') || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch(e) { return []; }
+}
+
+function clearChatHistory() {
+  chatHistory = [];
+  localStorage.removeItem('sage_chat_history');
+  document.getElementById('chat-messages').innerHTML = '';
+  initChat();
+  showNotif('Chat history cleared — fresh start!');
+}
+
+function initChat() {
+  const name = profile.name || 'there';
+  const goalLabels = { first100:'making your first $100 online', freelance:'landing freelance clients', passive:'building passive income', scale:'scaling your side hustle' };
+  const goalText = goalLabels[profile.goal] || 'achieving your income goals';
+
+  const saved = loadChatHistory();
+
+  if (saved.length > 0) {
+    chatHistory = saved;
+    saved.forEach(m => addMessage(m.role === 'assistant' ? 'sage' : 'user', m.content));
+    const divider = document.createElement('div');
+    divider.style.cssText = 'text-align:center;font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;padding:8px 0;border-top:1px solid var(--border);margin-top:8px';
+    divider.textContent = '— Welcome back. Continuing your session —';
+    document.getElementById('chat-messages').appendChild(divider);
+    scrollChat();
+  } else {
+    addMessage('sage', `Hey ${name}. I'm SAGE — your AI coach on SkillPay.
+
+I know you're here to work on **${goalText}**, you have **${profile.time || '1hr'}/day** to commit, and your biggest challenge is **${profile.challenge || 'getting started'}**.
+
+No generic advice here. I'm going to push you toward specific action every single session.
+
+**What would you like to work on today?** You can ask me anything about your SkillPay courses, strategy, income goals, or next steps.`);
+  }
+
+  const header = document.querySelector('.chat-header');
+  if (header && !document.getElementById('clear-chat-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'clear-chat-btn';
+    btn.textContent = 'Clear history';
+    btn.style.cssText = 'margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;color:var(--muted);font-family:var(--sans);font-size:11px;cursor:pointer;transition:all 0.2s';
+    btn.onmouseover = () => { btn.style.borderColor = '#ff4757'; btn.style.color = '#ff4757'; };
+    btn.onmouseout = () => { btn.style.borderColor = 'rgba(255,255,255,0.1)'; btn.style.color = 'var(--muted)'; };
+    btn.onclick = () => { if(confirm('Clear all chat history with SAGE?')) clearChatHistory(); };
+    document.querySelector('.online-dot').before(btn);
+  }
+}
+
+function addMessage(type, text) {
+  const div = document.createElement('div');
+  div.className = `msg ${type}`;
+  
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = type === 'sage' ? '🧠' : '👤';
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = formatMsg(text);
+  
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+}
+
+function formatMsg(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function scrollChat() {
+  const msgs = document.getElementById('chat-messages');
+  setTimeout(() => msgs.scrollTop = msgs.scrollHeight, 50);
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg sage';
+  div.id = 'typing';
+  div.innerHTML = `
+    <div class="msg-avatar">🧠</div>
+    <div class="msg-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  
+  input.value = '';
+  autoResize(input);
+  
+  addMessage('user', text);
+  chatHistory.push({ role:'user', content:text });
+  
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+  
+  try {
+    const reply = await callGeminiChat(chatHistory, buildSystemPrompt());
+    chatHistory.push({ role:'assistant', content:reply });
+    saveChatHistory();
+    removeTyping();
+    addMessage('sage', reply);
+  } catch(e) {
+    removeTyping();
+    addMessage('sage', 'Connection issue. Make sure your Gemini API key is set at the top of the file.');
+  }
+  
+  document.getElementById('send-btn').disabled = false;
+}
+
+function handleChatKey(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function quickPrompt(btn) {
+  const text = btn.textContent.trim().split('\n').slice(1).join(' ').trim();
+  document.getElementById('chat-input').value = text;
+  switchTab('chat', document.querySelector('.nav-item:nth-child(2)'));
+  sendMessage();
+}
+
+function updateChatContext() {
+  const goalLabels = { first100:'First $100 online', freelance:'Freelance clients', passive:'Passive income', scale:'Scale hustle' };
+  document.getElementById('chat-context').innerHTML = `
+    🎯 <strong style="color:var(--text)">Goal:</strong> ${goalLabels[profile.goal] || '—'}<br>
+    ⏱️ <strong style="color:var(--text)">Time:</strong> ${profile.time || '—'}/day<br>
+    🛠️ <strong style="color:var(--text)">Skills:</strong> ${(profile.skills||[]).join(', ') || 'Developing'}<br>
+    📚 <strong style="color:var(--text)">Lessons done:</strong> ${(profile.completedLessons||[]).length}/97<br>
+    🔥 <strong style="color:var(--text)">Challenge:</strong> ${profile.challenge || '—'}
+  `;
+}
+
+// ===========================
+// WEEKLY CHECK-IN
+// ===========================
+let selectedRating = null;
+
+function selectRating(btn, val) {
+  document.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedRating = val;
+}
+
+async function analyzeWeek() {
+  const ci1 = document.getElementById('ci-1').value.trim();
+  const ci2 = document.getElementById('ci-2').value.trim();
+  const ci3 = document.getElementById('ci-3').value.trim();
+  const ci4 = document.getElementById('ci-4').value.trim();
+  
+  if(!ci1) { alert('Please fill in at least what you did this week!'); return; }
+  
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ SAGE is analyzing...';
+  
+  const prompt = `Analyze this student's week and give brutally honest, specific coaching:
+
+STUDENT PROFILE:
+- Goal: ${profile.goal}
+- Time available: ${profile.time}/day
+- Challenge: ${profile.challenge}
+- Lessons completed total: ${(profile.completedLessons||[]).length}/97
+
+THIS WEEK:
+1. What they did: ${ci1}
+2. Money earned: ${ci2 || 'Nothing reported'}
+3. What they didn't do: ${ci3 || 'Not mentioned'}
+4. Biggest obstacle: ${ci4 || 'Not mentioned'}
+5. Self-rating: ${selectedRating || 'Not rated'}/5
+
+Give:
+1. **Honest Assessment** — What their week actually shows about their trajectory
+2. **The Real Problem** — What's actually holding them back (not what they think)
+3. **What They Did Right** — Even if small, celebrate specific wins
+4. **3 Non-Negotiables for Next Week** — Specific, measurable actions
+5. **Do This TODAY** — One action they can take in the next hour
+
+Be direct, specific, and treat them like a $500/hour coach would. No fluff.`;
+  
+  try {
+    const result = await callGemini(prompt, buildSystemPrompt());
+    document.getElementById('checkin-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('checkin-content').innerHTML = formatMsg(result);
+    document.getElementById('checkin-result').style.display = 'block';
+    document.getElementById('checkin-result').scrollIntoView({ behavior:'smooth', block:'start' });
+    localStorage.setItem('sage_last_checkin', JSON.stringify({ date:new Date().toISOString(), result }));
+  } catch(e) {
+    document.getElementById('checkin-content').textContent = 'Connection error. Make sure your Gemini API key is set.';
+    document.getElementById('checkin-result').style.display = 'block';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '🧠 Analyze My Week with SAGE';
+}
+
+// ===========================
+// ACTION PLAN
+// ===========================
+async function generateActionPlan() {
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  document.getElementById('action-plan-content').textContent = 'SAGE is creating your personalized plan...';
+  
+  const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  
+  const prompt = `Generate a highly specific action plan for TODAY (${today}).
+
+STUDENT:
+- Name: ${profile.name}
+- Goal: ${profile.goal}
+- Available time: ${profile.time}/day  
+- Skills: ${(profile.skills||[]).join(', ')}
+- Challenge: ${profile.challenge}
+- Lessons completed: ${(profile.completedLessons||[]).length}/97
+
+Create:
+1. **Today's Mission** — One sentence that frames what today is about
+2. **The 3 Actions That Matter Most Today** — Specific, time-stamped tasks with exact durations
+3. **The 15-Minute Win** — If they have ZERO time, one thing they can do in 15 minutes that still moves the needle
+4. **Mindset Anchor** — One brutal truth they need to hear today to stay focused
+5. **Success Metric** — How they'll know today was a win
+
+Also list exactly 5 specific tasks as a checklist (format as: TASK: [task text] | PRIORITY: high/medium/low).
+
+Make it feel like you know this specific person. Reference their specific situation.`;
+  
+  try {
+    const result = await callGemini(prompt, buildSystemPrompt());
+    if(result) {
+    
+    // Parse tasks from result
+    tasks = [];
+    const taskRegex = /TASK:\s*(.+?)\s*\|\s*PRIORITY:\s*(high|medium|low)/gi;
+    let match;
+    while((match = taskRegex.exec(result)) !== null) {
+      tasks.push({ text:match[1].trim(), priority:match[2].toLowerCase(), done:false });
+    }
+    
+    // Clean text (remove task lines for display)
+    const cleanResult = result.replace(/TASK:.*?PRIORITY:\s*(high|medium|low)/gi, '').trim();
+    
+    document.getElementById('action-plan-content').innerHTML = formatMsg(cleanResult);
+    
+    // Render tasks
+    renderTasks();
+    
+    // Focus note
+    document.getElementById('focus-note').innerHTML = `<span style="color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;">Today's Context</span><br><br>
+    <strong style="color:var(--text)">Goal:</strong> ${profile.goal}<br>
+    <strong style="color:var(--text)">Time:</strong> ${profile.time}/day<br><br>
+    <span style="color:var(--muted)">Stay focused on the top 3 actions. Everything else is a distraction today.</span>`;
+    
+    localStorage.setItem('sage_action_plan', JSON.stringify({ date:new Date().toISOString(), tasks, result }));
+    }
+  } catch(e) {
+    document.getElementById('action-plan-content').textContent = 'Error generating plan. Check your connection.';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '⚡ Regenerate Plan';
+}
+
+function renderTasks() {
+  if(tasks.length === 0) {
+    document.getElementById('task-list').innerHTML = '<div style="font-size:13px;color:var(--muted);">No tasks parsed — view the plan above.</div>';
+    return;
+  }
+  
+  document.getElementById('task-list').innerHTML = tasks.map((t,i) => `
+    <div class="task-item ${t.done?'done':''}" onclick="toggleTask(${i})">
+      <div class="task-check">${t.done?'✓':''}</div>
+      <div>
+        <div class="task-text">${t.text}</div>
+        <div class="task-priority ${t.priority}">${t.priority.toUpperCase()} PRIORITY</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTask(i) {
+  tasks[i].done = !tasks[i].done;
+  renderTasks();
+  
+  const done = tasks.filter(t=>t.done).length;
+  if(done === tasks.length && tasks.length > 0) showNotif('🔥 All tasks complete! Incredible work today.');
+}
+
+// ===========================
+// INSIGHTS
+// ===========================
+function buildProgressBars() {
+  const cats = [
+    { label:'Beginner Courses', key:'first100', total:3 },
+    { label:'Freelancing & Income', key:'freelance', total:3 },
+    { label:'Content & Growth', key:'growth', total:4 },
+    { label:'Advanced Business', key:'advanced', total:4 },
+    { label:'Trading & Investing', key:'trading', total:3 }
+  ];
+  
+  const completed = (profile.completedLessons || []).length;
+  const totalAll = 97;
+  const pct = Math.min(100, Math.round((completed/totalAll)*100));
+  
+  document.getElementById('progress-bars').innerHTML = cats.map(c => {
+    const fill = Math.min(100, Math.round(Math.random()*pct*1.5)); // demo approximation
+    return `
+      <div class="progress-item">
+        <div class="progress-label"><span>${c.label}</span><span>${fill}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${fill}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function buildAlignment() {
+  const goalScore = Math.round(Math.random()*30 + 60);
+  const timeScore = Math.round(Math.random()*20 + 70);
+  const skillScore = Math.round(Math.random()*25 + 65);
+  
+  document.getElementById('alignment-content').innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>Goal Clarity</span><span style="color:var(--green);font-family:var(--mono)">${goalScore}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${goalScore}%"></div></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>Time Commitment</span><span style="color:var(--green);font-family:var(--mono)">${timeScore}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${timeScore}%"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>Skill-Goal Match</span><span style="color:var(--green);font-family:var(--mono)">${skillScore}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${skillScore}%"></div></div>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--green-dim);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-family:var(--mono);color:var(--green);letter-spacing:1px;margin-bottom:4px">SAGE'S VERDICT</div>
+      <div style="font-size:12px;color:var(--text)">Your goal and time commitment are ${timeScore > 75 ? 'well aligned' : 'slightly mismatched'}. Complete more courses to improve your trajectory score.</div>
+    </div>
+  `;
+}
+
+async function loadInsights() {
+  document.getElementById('insights-content').textContent = 'SAGE is analyzing your learning patterns...';
+  
+  const prompt = `Analyze this SkillPay student's profile and give a deep performance analysis:
+
+PROFILE:
+- Goal: ${profile.goal}
+- Time: ${profile.time}/day
+- Skills: ${(profile.skills||[]).join(', ')}
+- Challenge: ${profile.challenge}
+- Lessons completed: ${(profile.completedLessons||[]).length}/97
+- Days on platform: ${Math.floor((new Date() - new Date(profile.startDate || Date.now())) / 86400000) + 1}
+
+Provide:
+1. **Your Income Potential** — Realistic range based on their specific situation in 6 and 12 months
+2. **Biggest Strength** — What they have that most people don't (based on their profile)
+3. **Biggest Blindspot** — What will silently hold them back if they don't address it
+4. **The Critical Path** — Exact sequence of 3 things that will move them fastest toward their goal
+5. **Warning Signs to Watch** — 2-3 patterns that kill progress for people in their exact situation
+6. **SAGE's Bottom Line** — One paragraph honest assessment of where they're headed
+
+Be direct and specific. This is a premium coaching analysis.`;
+  
+  try {
+    const result = await callGemini(prompt, buildSystemPrompt());
+    document.getElementById('insights-content').innerHTML = formatMsg(result);
+  } catch(e) {
+    document.getElementById('insights-content').textContent = 'Connection error. Make sure your Gemini API key is set.';
+  }
+}
+
+// ===========================
+// NAV
+// ===========================
+function switchTab(id, navEl) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(navEl) navEl.classList.add('active');
+}
+
+// ===========================
+// UTILS
+// ===========================
+function showNotif(msg) {
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.innerHTML = msg;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 4000);
+}
+
+// ===========================
+// BOOT
+// ===========================
+(function init(){
+  // Grant pro access
+  localStorage.setItem('skillpay_pro_access','true');
+  localStorage.setItem('skillpay_pro','true');
+  localStorage.setItem('skillpay_plan','pro');
+  
+  initProgress();
+  
+  // Check if already onboarded
+  const saved = localStorage.getItem('sage_profile');
+  if(saved) {
+    try {
+      profile = JSON.parse(saved);
+      if(profile.name) {
+        document.getElementById('onboarding').style.display = 'none';
+        initApp();
+        return;
+      }
+    } catch(e){}
+  }
+  
+  // Show step 1
+  document.getElementById('name-input').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') nextStep(1);
+  });
+})();
+</script>
+</body>
+</html>
